@@ -11,6 +11,25 @@
       rel="stylesheet"
     />
     <title>Learn Trainer</title>
+    <script>
+      (function () {
+        try {
+          var key = 'learn-trainer-theme';
+          var stored = localStorage.getItem(key);
+          var mode = 'system';
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            mode = parsed && parsed.state && parsed.state.mode ? parsed.state.mode : 'system';
+          }
+          var isDark =
+            mode === 'dark' ||
+            (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var root = document.documentElement;
+          if (isDark) root.classList.add('dark');
+          root.style.colorScheme = isDark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

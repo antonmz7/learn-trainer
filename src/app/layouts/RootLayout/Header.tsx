@@ -1,8 +1,9 @@
 import { GraduationCap } from 'lucide-react';
 import { Link, NavLink } from 'react-router';
 
+import { ThemeToggle } from '@/features/theme';
 import { ROUTES } from '@/shared/config/routes';
-import { cn } from '@/shared/lib/utils';
+import { cn } from '@/shared/lib';
 
 export function Header() {
   return (
@@ -13,10 +14,14 @@ export function Header() {
           <span>Learn Trainer</span>
         </Link>
 
-        <nav className="flex items-center gap-1">
-          <HeaderLink to={ROUTES.home}>Главная</HeaderLink>
-          <HeaderLink to={ROUTES.areas}>Области</HeaderLink>
-        </nav>
+        <div className="flex items-center gap-3">
+          <nav className="flex items-center gap-1">
+            <HeaderLink to={ROUTES.home}>Главная</HeaderLink>
+            <HeaderLink to={ROUTES.areas}>Области</HeaderLink>
+          </nav>
+          <div className="bg-border h-5 w-px" aria-hidden="true" />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
