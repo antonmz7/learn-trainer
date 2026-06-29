@@ -8,11 +8,14 @@ import { useQuestionsQuery } from '@/entities/question';
 import { useTopicQuery } from '@/entities/topic';
 import {
   QuestionCard,
+  TrainerCompleted,
   TrainerNavigator,
   TrainerProgress,
+  TrainerToolbar,
   useTrainerStore,
 } from '@/features/question-trainer';
 import { ROUTES } from '@/shared/config/routes';
+import { useHotkeys } from '@/shared/hooks';
 import { useTypedParams } from '@/shared/lib';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { EmptyState } from '@/shared/ui/empty-state';
@@ -84,17 +87,30 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
   const initialize = useTrainerStore((state) => state.initialize);
   const currentIndex = useTrainerStore((state) => state.currentIndex);
   const isAnswerVisible = useTrainerStore((state) => state.isAnswerVisible);
+  const isShuffled = useTrainerStore((state) => state.isShuffled);
   const toggleAnswer = useTrainerStore((state) => state.toggleAnswer);
   const goNext = useTrainerStore((state) => state.goNext);
   const goPrevious = useTrainerStore((state) => state.goPrevious);
+  const shuffle = useTrainerStore((state) => state.shuffle);
+  const restart = useTrainerStore((state) => state.restart);
   const canGoNext = useTrainerStore((state) => state.canGoNext());
   const canGoPrevious = useTrainerStore((state) => state.canGoPrevious());
+  const isFinished = useTrainerStore((state) => state.isFinished());
+  const realQuestionIndex = useTrainerStore((state) => state.getCurrentQuestionIndex());
 
   useEffect(() => {
     if (questions && questions.length > 0) {
       initialize(questions.length);
     }
   }, [questions, initialize]);
+
+  // Клавиатурные шорткаты — определяем хуком на верхнем уровне,
+  // но обработчики ничего не сделают, если questions ещё не загрузились
+  useHotkeys([
+    { key: ' ', handler: toggleAnswer },
+    { key: 'ArrowRight', handler: goNext },
+    { key: 'ArrowLeft', handler: goPrevious },
+  ]);
 
   if (isLoading) {
     return (
@@ -125,11 +141,19 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
     );
   }
 
-  const currentQuestion = questions[currentIndex];
-  const isLastQuestion = currentIndex === questions.length - 1;
+  // Экран завершения показываем, когда пользователь на последнем вопросе
+  // И открыл ответ — это сигнал, что он действительно его проработал
+  if (isFinished && isAnswerVisible) {
+    return (
+      <TrainerCompleted totalQuestions={questions.length} onRestart={restart} onShuffle={shuffle} />
+    );
+  }
+
+  const currentQuestion = questions[realQuestionIndex];
 
   return (
     <div className="flex flex-col gap-6">
+      <TrainerToolbar isShuffled={isShuffled} onShuffle={shuffle} />
       <TrainerProgress current={currentIndex} total={questions.length} />
 
       <QuestionCard
@@ -143,7 +167,7 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
         onNext={goNext}
         canGoPrevious={canGoPrevious}
         canGoNext={canGoNext}
-        isLastQuestion={isLastQuestion}
+        isLastQuestion={isFinished}
       />
     </div>
   );
