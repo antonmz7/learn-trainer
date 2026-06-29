@@ -1,2 +1,3 @@
-export { topicApi } from './api';
-export type { Topic } from './model';
+export { topicApi, useTopicsQuery } from './api';
+export type { Topic, TopicWithStats } from './model';
+export { TopicCard, TopicCardSkeleton } from './ui';

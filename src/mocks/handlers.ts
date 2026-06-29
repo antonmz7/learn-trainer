@@ -1,7 +1,7 @@
 import type { Area } from '@/entities/area/model';
 import type { Direction } from '@/entities/direction/model';
 import type { Question } from '@/entities/question/model';
-import type { Topic } from '@/entities/topic/model';
+import type { Topic, TopicWithStats } from '@/entities/topic/model';
 
 import { mockAreas, mockDirections, mockQuestions, mockTopics } from './data';
 
@@ -44,12 +44,19 @@ export const fetchDirectionBySlug = async (
 export const fetchTopicsByDirectionSlug = async (
   areaSlug: string,
   directionSlug: string,
-): Promise<Topic[]> => {
+): Promise<TopicWithStats[]> => {
   const area = mockAreas.find((a) => a.slug === areaSlug);
   if (!area) return delay([]);
   const direction = mockDirections.find((d) => d.areaId === area.id && d.slug === directionSlug);
   if (!direction) return delay([]);
-  const topics = mockTopics.filter((t) => t.directionId === direction.id);
+
+  const topics = mockTopics
+    .filter((t) => t.directionId === direction.id)
+    .map<TopicWithStats>((topic) => ({
+      ...topic,
+      questionsCount: mockQuestions.filter((q) => q.topicId === topic.id).length,
+    }));
+
   return delay(topics);
 };
 

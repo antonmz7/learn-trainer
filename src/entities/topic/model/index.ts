@@ -1,1 +1,1 @@
-export type { Topic } from './types';
+export type { Topic, TopicWithStats } from './types';
