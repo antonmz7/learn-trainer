@@ -1,4 +1,5 @@
 import { Shuffle } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/shared/ui/button';
 
@@ -8,6 +9,13 @@ interface TrainerToolbarProps {
 }
 
 export function TrainerToolbar({ isShuffled, onShuffle }: TrainerToolbarProps) {
+  const handleShuffle = () => {
+    onShuffle();
+    toast.success('Вопросы перемешаны', {
+      description: 'Начинаем с первого вопроса в новом порядке',
+    });
+  };
+
   return (
     <div className="flex items-center justify-between gap-2">
       <p className="text-muted-foreground text-xs">
@@ -28,7 +36,7 @@ export function TrainerToolbar({ isShuffled, onShuffle }: TrainerToolbarProps) {
         type="button"
         variant={isShuffled ? 'secondary' : 'outline'}
         size="sm"
-        onClick={onShuffle}
+        onClick={handleShuffle}
       >
         <Shuffle className="size-3.5" aria-hidden="true" />
         {isShuffled ? 'Перемешано' : 'Перемешать'}
