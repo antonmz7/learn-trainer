@@ -1,13 +1,23 @@
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
+import type { FallbackProps } from 'react-error-boundary';
 
 import { Button } from './button';
 
-interface ErrorFallbackProps {
-  error: Error;
-  resetErrorBoundary: () => void;
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Неизвестная ошибка';
 }
 
-export function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
+function getErrorStack(error: unknown): string | undefined {
+  if (error instanceof Error) return error.stack;
+  return undefined;
+}
+
+export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  const message = getErrorMessage(error);
+  const stack = getErrorStack(error);
+
   return (
     <div
       role="alert"
@@ -30,8 +40,8 @@ export function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps)
             Детали ошибки (только в dev)
           </summary>
           <pre className="bg-muted mt-2 overflow-auto rounded-md p-3 text-xs">
-            {error.message}
-            {error.stack && '\n\n' + error.stack}
+            {message}
+            {stack && '\n\n' + stack}
           </pre>
         </details>
       )}
