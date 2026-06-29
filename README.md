@@ -1,73 +1,145 @@
-# React + TypeScript + Vite
+# Learn Trainer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Веб-приложение для обучения через интервальное повторение вопросов. Пользователь выбирает область, направление и тему — приложение по очереди показывает вопросы со скрытым ответом, который раскрывается по клику.
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Демо
 
-## React Compiler
+🔗 [learn-trainer.vercel.app](https://learn-trainer.vercel.app) _(добавится после деплоя)_
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Возможности
 
-## Expanding the ESLint configuration
+- 🗂 Иерархия знаний: области → направления → темы → вопросы
+- 🎯 Тренажёр со скрытым ответом, плавно раскрываемым по нажатию
+- 🔀 Перемешивание вопросов (Fisher–Yates) для разнообразия
+- ⌨️ Клавиатурные шорткаты: `Space` (ответ), `←` `→` (навигация)
+- 🌗 Тёмная тема с поддержкой системных предпочтений (без FOUC)
+- 💾 Кэширование запросов через TanStack Query
+- ♿ Доступность: семантическая разметка, ARIA, screen reader hints
+- 🚦 Полная обработка состояний: loading / error / empty / success
+- 🧪 31 тест, покрывающий критическую логику
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Стек
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Core
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **React 19** + **TypeScript** (strict mode)
+- **Vite 7** — сборщик и dev-server
+- **React Router v7** — клиентский роутинг
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+### Данные и состояние
+
+- **TanStack Query** — серверный стейт, кэш, дедупликация запросов
+- **Zustand** — клиентский стейт (тренажёр, тема)
+
+### UI
+
+- **Tailwind CSS v4** — стили
+- **shadcn/ui** + **Radix UI** — accessibility-first компоненты
+- **Lucide** — иконки
+- **Sonner** — уведомления
+
+### Качество
+
+- **ESLint** (flat config) + **Prettier** + **simple-import-sort**
+- **Husky** + **lint-staged** + **commitlint** (Conventional Commits)
+- **Vitest** + **React Testing Library** — тесты
+
+## Запуск
+
+Требуется Node.js 20+.
+
+```bash
+# установка зависимостей
+npm install
+
+# режим разработки
+npm run dev
+
+# сборка
+npm run build
+
+# тесты
+npm run test         # watch-режим
+npm run test:run     # один прогон (для CI)
+npm run test:ui      # интерактивный интерфейс
+
+# проверки
+npm run lint
+npm run type-check
+npm run format
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Архитектура
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+Проект организован по принципам **Feature-Sliced Design (lite)** — слои с правилами импортов:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
 ```
+src/
+├── app/             # инфраструктура: провайдеры, роутер, лейаут
+├── pages/           # страницы-роуты (только композиция)
+├── features/        # бизнес-фичи (тренажёр, тема)
+├── entities/        # бизнес-сущности (области, направления, темы, вопросы)
+├── shared/          # переиспользуемое: UI, утилиты, хуки, конфиг
+└── mocks/           # моковые данные и асинхронные handlers
+```
+
+**Правило импортов:** слой выше может импортировать только из слоёв ниже. Это автоматически защищает от спагетти-зависимостей.
+
+Каждая сущность имеет свою структуру:
+
+```
+entities/area/
+├── api/             # хуки запросов и API-слой
+├── model/           # типы и схемы
+├── ui/              # презентационные компоненты
+└── index.ts         # публичный API сущности
+```
+
+## Ключевые архитектурные решения
+
+### Разделение серверного и клиентского стейта
+
+Серверные данные живут в **TanStack Query** — это не глобальный сторе, а кэш с автоматической инвалидацией. Клиентское UI-состояние (текущий вопрос, открыт ли ответ) живёт в **Zustand**. Это разные задачи с разной семантикой, и они требуют разных инструментов.
+
+### Моки как асинхронный API
+
+Моки реализованы как `async`-функции с искусственной задержкой, имитируя сеть. API-слой каждой сущности импортирует именно эти функции. При переходе на реальный бэкенд изменится **только** содержимое `entities/*/api/` — компоненты и хуки не заметят разницы.
+
+### Типы сущностей
+
+Структура моков повторяет реляционную БД: первичные ключи (`id`) и внешние (`areaId`, `directionId`). Это значит, что переход на Postgres/MySQL не потребует переписывания типов.
+
+Для случаев с агрегатами введены расширенные типы — например `TopicWithStats` содержит `questionsCount`, который сервер будет вычислять через `COUNT(*) ... GROUP BY`.
+
+### Защита от FOUC при dark mode
+
+Инлайн-скрипт в `index.html` синхронно применяет сохранённую тему **до** загрузки React. Без этого был бы заметный кадр со светлой темой при тёмной настройке. Дополнительно устанавливается `color-scheme` — это влияет на скроллбары и нативные элементы.
+
+### Error Boundaries на двух уровнях
+
+- **App-level** — последняя линия обороны (если упадёт сам роутер)
+- **Page-level** — внутри `Outlet`, ловит ошибки страниц, не ломая навигацию
+
+Page-level использует `resetKeys={[location.key]}` — это автосбрасывает границу при переходе на другую страницу, иначе ошибка «прилипала» бы.
+
+### Алгоритм перемешивания Fisher–Yates
+
+Используется математически корректный алгоритм, дающий равномерное распределение перестановок. Популярный `array.sort(() => Math.random() - 0.5)` даёт неравномерный результат и здесь намеренно не используется.
+
+## Roadmap
+
+- [ ] Регистрация / авторизация
+- [ ] Реальный бэкенд (Node.js + Postgres)
+- [ ] Создание / редактирование областей, направлений, тем, вопросов
+- [ ] Статистика прохождения и отслеживание прогресса
+- [ ] Интервальное повторение (алгоритм SM-2)
+- [ ] Экспорт/импорт тем
+
+## Лицензия
+
+MIT
