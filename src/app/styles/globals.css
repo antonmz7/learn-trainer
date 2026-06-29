@@ -144,3 +144,64 @@ html {
     @apply font-sans;
   }
 }
+
+/* Стили для prose-контента (вопросы/ответы из HTML) */
+.prose-question,
+.prose-answer {
+  /* Базовые отступы между блоками */
+  & p:not(:first-child) {
+    margin-top: 0.75rem;
+  }
+
+  & ul,
+  & ol {
+    margin-top: 0.75rem;
+    padding-left: 1.5rem;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li {
+    margin-top: 0.25rem;
+  }
+
+  & li > ul,
+  & li > ol {
+    margin-top: 0.25rem;
+  }
+
+  /* Вложенные списки */
+  & li > p {
+    margin-top: 0;
+    display: inline;
+  }
+
+  & code {
+    border-radius: 0.25rem;
+    background-color: var(--muted);
+    padding: 0.125rem 0.375rem;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.875em;
+  }
+
+  & strong {
+    font-weight: 600;
+  }
+
+  & em {
+    font-style: italic;
+  }
+
+  & br {
+    /* br работает по умолчанию, но иногда нужен control */
+    display: block;
+    content: '';
+    margin-top: 0.25rem;
+  }
+}
