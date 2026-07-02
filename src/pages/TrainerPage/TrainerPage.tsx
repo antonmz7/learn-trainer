@@ -151,6 +151,15 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
 
   const currentQuestion = questions[realQuestionIndex];
 
+  if (!currentQuestion) {
+    return (
+      <div className="flex flex-col gap-4">
+        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-40 w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <TrainerToolbar isShuffled={isShuffled} onShuffle={shuffle} />
