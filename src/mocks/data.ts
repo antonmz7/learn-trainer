@@ -84,15 +84,6 @@ export const mockTopics: Topic[] = [
     updatedAt: NOW,
   },
   {
-    id: 'topic_js_symbol',
-    directionId: 'dir_frontend',
-    slug: 'symbol',
-    name: 'JavaScript: Symbol',
-    description: '',
-    createdAt: NOW,
-    updatedAt: NOW,
-  },
-  {
     id: 'topic_js_coercion',
     directionId: 'dir_frontend',
     slug: 'type-coercion',
@@ -133,15 +124,6 @@ export const mockTopics: Topic[] = [
     directionId: 'dir_frontend',
     slug: 'error-handling',
     name: 'JavaScript: Обработка ошибок',
-    description: '',
-    createdAt: NOW,
-    updatedAt: NOW,
-  },
-  {
-    id: 'topic_js_error_types',
-    directionId: 'dir_frontend',
-    slug: 'error-types',
-    name: 'JavaScript: Ошибки — встроенные типы',
     description: '',
     createdAt: NOW,
     updatedAt: NOW,
@@ -682,6 +664,26 @@ export const mockQuestions: Question[] = [
     createdAt: NOW,
     updatedAt: NOW,
   },
+  {
+    id: 'q_types_values_012',
+    topicId: 'topic_js_types',
+    question: 'Что такое Symbol? Зачем он нужен?',
+    answer:
+      '<p>Symbol - примитивный тип (ES2015), главное свойство которого - гарантированная уникальность. Каждый вызов Symbol() создаёт новое, ни с чем не равное значение, даже если описание одинаковое:</p><pre>Symbol("id") === Symbol("id"); // false - это разные символы</pre><p>Аргумент Symbol("описание") - лишь метка для отладки (доступна через .description), на уникальность не влияет.</p><p>Symbol нельзя создать через new (это примитив, а не объект): new Symbol() бросает TypeError.</p><p>Главное применение - уникальные ключи свойств объекта, которые гарантированно не конфликтуют с другими:</p><pre>const id = Symbol("id");\nobj[id] = 123; // ключ, который точно не пересечётся с обычными</pre><p>Особенности символьных ключей:</p><ul><li>«Скрытость»: символьные свойства НЕ появляются в обычных переборах - for...in, Object.keys, JSON.stringify их игнорируют. Это не настоящая приватность, но защита от случайного доступа и коллизий</li><li>Получить их можно только специально: Object.getOwnPropertySymbols(obj) или Reflect.ownKeys(obj)</li><li>При этом при копировании объекта символьные ключи переносятся - через Object.assign() и спред {...obj} (несмотря на то что в перечислениях они скрыты)</li></ul><p>Зачем нужны символы:</p><ul><li>Добавить метаданные/служебные свойства к чужому объекту, не рискуя перезаписать существующие ключи и не «засветившись» в переборах</li><li>Определять системное поведение объекта через well-known символы (например сделать объект итерируемым)</li><li>Создавать «константы»-идентификаторы, гарантированно уникальные (вместо строковых енумов, где возможны коллизии)</li></ul><p>Нюансы:</p><ul><li>Symbol не приводится к строке неявно: "" + sym бросает TypeError (чтобы не терять уникальность по ошибке). Явно - String(sym) или sym.toString()</li><li>typeof возвращает "symbol"</li><li>Символы можно использовать как ключи в обычном объекте и в Map</li></ul>',
+    order: 12,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_types_values_013',
+    topicId: 'topic_js_types',
+    question: 'Что такое глобальный реестр символов и well-known символы?',
+    answer:
+      '<p>Это два «системных» механизма вокруг символов.</p><p>Глобальный реестр символов (global symbol registry) - способ создать символ, общий для всего приложения (и даже между разными realm, например окном и iframe):</p><ul><li>Symbol.for(key) - возвращает символ из глобального реестра по строковому ключу; если такого ещё нет - создаёт и регистрирует. Повторный вызов с тем же ключом вернёт ТОТ ЖЕ символ: Symbol.for("id") === Symbol.for("id") даёт true</li><li>Symbol.keyFor(sym) - обратная операция: возвращает строковый ключ, под которым символ зарегистрирован (или undefined для обычных символов)</li></ul><p>Отличие от обычного Symbol(): обычный всегда уникален, а Symbol.for намеренно переиспользует один символ по ключу - для разделяемых идентификаторов.</p><p>Well-known символы (системные) - встроенные символы, через которые объект может настроить своё поведение для встроенных операций языка. Основные:</p><ul><li>Symbol.iterator - делает объект итерируемым (работает с for...of, спредом, деструктуризацией)</li><li>Symbol.asyncIterator - для асинхронной итерации (for await...of)</li><li>Symbol.hasInstance - кастомизирует поведение instanceof</li><li>Symbol.toPrimitive - управляет приведением объекта к примитиву (перекрывает toString/valueOf)</li><li>Symbol.toStringTag - задаёт «хвост» в Object.prototype.toString (получить "[object MyType]")</li><li>Symbol.isConcatSpreadable - влияет на то, разворачивает ли concat объект как массив</li><li>Symbol.species - задаёт конструктор, используемый методами вроде map при создании производных объектов</li><li>Symbol.match / replace / search / split - позволяют объекту вести себя как регулярное выражение в соответствующих строковых методах</li></ul><p>Смысл well-known символов: они дают «точки расширения» - возможность встроить пользовательский объект в стандартные механизмы языка, переопределив реакцию на iteration, instanceof, приведение типов и т.д. Именно через Symbol.iterator пишут собственные итераторы (часто в паре с генераторами).</p>',
+    order: 13,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
 
   // JavaScript: Числа, точность и Math (slug: numbers-math, topicId: topic_js_numbers) — 4 вопрос(ов)
   {
@@ -869,29 +871,6 @@ export const mockQuestions: Question[] = [
     createdAt: NOW,
     updatedAt: NOW,
   },
-
-  // JavaScript: Symbol (slug: symbol, topicId: topic_js_symbol) — 2 вопрос(ов)
-  {
-    id: 'q_symbol_001',
-    topicId: 'topic_js_symbol',
-    question: 'Что такое Symbol? Зачем он нужен?',
-    answer:
-      '<p>Symbol - примитивный тип (ES2015), главное свойство которого - гарантированная уникальность. Каждый вызов Symbol() создаёт новое, ни с чем не равное значение, даже если описание одинаковое:</p><pre>Symbol("id") === Symbol("id"); // false - это разные символы</pre><p>Аргумент Symbol("описание") - лишь метка для отладки (доступна через .description), на уникальность не влияет.</p><p>Symbol нельзя создать через new (это примитив, а не объект): new Symbol() бросает TypeError.</p><p>Главное применение - уникальные ключи свойств объекта, которые гарантированно не конфликтуют с другими:</p><pre>const id = Symbol("id");\nobj[id] = 123; // ключ, который точно не пересечётся с обычными</pre><p>Особенности символьных ключей:</p><ul><li>«Скрытость»: символьные свойства НЕ появляются в обычных переборах - for...in, Object.keys, JSON.stringify их игнорируют. Это не настоящая приватность, но защита от случайного доступа и коллизий</li><li>Получить их можно только специально: Object.getOwnPropertySymbols(obj) или Reflect.ownKeys(obj)</li><li>При этом при копировании объекта символьные ключи переносятся - через Object.assign() и спред {...obj} (несмотря на то что в перечислениях они скрыты)</li></ul><p>Зачем нужны символы:</p><ul><li>Добавить метаданные/служебные свойства к чужому объекту, не рискуя перезаписать существующие ключи и не «засветившись» в переборах</li><li>Определять системное поведение объекта через well-known символы (например сделать объект итерируемым)</li><li>Создавать «константы»-идентификаторы, гарантированно уникальные (вместо строковых енумов, где возможны коллизии)</li></ul><p>Нюансы:</p><ul><li>Symbol не приводится к строке неявно: "" + sym бросает TypeError (чтобы не терять уникальность по ошибке). Явно - String(sym) или sym.toString()</li><li>typeof возвращает "symbol"</li><li>Символы можно использовать как ключи в обычном объекте и в Map</li></ul>',
-    order: 1,
-    createdAt: NOW,
-    updatedAt: NOW,
-  },
-  {
-    id: 'q_symbol_002',
-    topicId: 'topic_js_symbol',
-    question: 'Что такое глобальный реестр символов и well-known символы?',
-    answer:
-      '<p>Это два «системных» механизма вокруг символов.</p><p>Глобальный реестр символов (global symbol registry) - способ создать символ, общий для всего приложения (и даже между разными realm, например окном и iframe):</p><ul><li>Symbol.for(key) - возвращает символ из глобального реестра по строковому ключу; если такого ещё нет - создаёт и регистрирует. Повторный вызов с тем же ключом вернёт ТОТ ЖЕ символ: Symbol.for("id") === Symbol.for("id") даёт true</li><li>Symbol.keyFor(sym) - обратная операция: возвращает строковый ключ, под которым символ зарегистрирован (или undefined для обычных символов)</li></ul><p>Отличие от обычного Symbol(): обычный всегда уникален, а Symbol.for намеренно переиспользует один символ по ключу - для разделяемых идентификаторов.</p><p>Well-known символы (системные) - встроенные символы, через которые объект может настроить своё поведение для встроенных операций языка. Основные:</p><ul><li>Symbol.iterator - делает объект итерируемым (работает с for...of, спредом, деструктуризацией)</li><li>Symbol.asyncIterator - для асинхронной итерации (for await...of)</li><li>Symbol.hasInstance - кастомизирует поведение instanceof</li><li>Symbol.toPrimitive - управляет приведением объекта к примитиву (перекрывает toString/valueOf)</li><li>Symbol.toStringTag - задаёт «хвост» в Object.prototype.toString (получить "[object MyType]")</li><li>Symbol.isConcatSpreadable - влияет на то, разворачивает ли concat объект как массив</li><li>Symbol.species - задаёт конструктор, используемый методами вроде map при создании производных объектов</li><li>Symbol.match / replace / search / split - позволяют объекту вести себя как регулярное выражение в соответствующих строковых методах</li></ul><p>Смысл well-known символов: они дают «точки расширения» - возможность встроить пользовательский объект в стандартные механизмы языка, переопределив реакцию на iteration, instanceof, приведение типов и т.д. Именно через Symbol.iterator пишут собственные итераторы (часто в паре с генераторами).</p>',
-    order: 2,
-    createdAt: NOW,
-    updatedAt: NOW,
-  },
-
   // JavaScript: Преобразование типов (slug: type-coercion, topicId: topic_js_coercion) — 7 вопрос(ов)
   {
     id: 'q_type_coercion_001',
@@ -1415,7 +1394,7 @@ export const mockQuestions: Question[] = [
 
   {
     id: 'q_error_handling_005',
-    topicId: 'topic_js_error_types',
+    topicId: 'topic_js_errors',
     question: 'Какие есть встроенные типы ошибок? Как устроена иерархия Error?',
     answer:
       '<p>Все встроенные ошибки наследуют от базового класса Error. От него происходят специализированные типы:</p><ul><li>TypeError - значение не того типа, которого ожидали (вызов не-функции, чтение свойства у null/undefined, изменение константы)</li><li>RangeError - значение вне допустимого диапазона (некорректная длина массива, превышение стека рекурсии, неверный radix у toString)</li><li>ReferenceError - обращение к несуществующей переменной (или к переменной в TDZ до объявления)</li><li>SyntaxError - некорректный синтаксис кода; бросается на этапе разбора, а также JSON.parse при невалидном JSON</li><li>URIError - неправильное использование функций работы с URI (decodeURIComponent с битой последовательностью)</li><li>EvalError - исторический, связан с eval, сейчас практически не используется</li><li>AggregateError - обёртка над НЕСКОЛЬКИМИ ошибками сразу; бросается Promise.any, когда отклонены все промисы (содержит массив errors)</li></ul><p>Свойства объекта ошибки:</p><ul><li>name - имя типа ошибки ("TypeError" и т.д.)</li><li>message - текстовое описание, переданное в конструктор</li><li>stack - строка стека вызовов на момент создания ошибки (нестандартизированное, но есть везде; полезно для отладки и логирования)</li></ul><p>Error.cause (ES2022) - возможность указать первопричину при перевыбрасывании, сохранив исходную ошибку:</p><pre>try {\n  // ...\n} catch (err) {\n  throw new Error("Не удалось загрузить данные", { cause: err });\n}</pre><p>Это решает давнюю проблему потери контекста: верхнеуровневая ошибка несёт ссылку на низкоуровневую через свойство cause - выстраивается цепочка причин.</p><p>Проверка типа ошибки - через instanceof:</p><pre>try { /* ... */ }\ncatch (err) {\n  if (err instanceof TypeError) { /* ... */ }\n  else if (err instanceof RangeError) { /* ... */ }\n  else throw err; // не наше - пробрасываем дальше\n}</pre><p>Важная практика: в catch стоит обрабатывать только ожидаемые типы ошибок, а неожиданные - пробрасывать дальше (re-throw), а не «глотать». Также в современном JS можно писать catch без параметра (catch {}), если объект ошибки не нужен. Свои классы ошибок наследуют от Error (или его наследников) - подробнее в вопросе о пользовательских ошибках.</p>',
@@ -1423,7 +1402,6 @@ export const mockQuestions: Question[] = [
     createdAt: NOW,
     updatedAt: NOW,
   },
-
   // JavaScript: Функции (slug: functions, topicId: topic_js_functions) — 23 вопрос(ов)
   {
     id: 'q_functions_001',
@@ -4668,17 +4646,1300 @@ export const mockQuestions: Question[] = [
     createdAt: NOW,
     updatedAt: NOW,
   },
-  // Vue: Реактивность
+  {
+    id: 'q_vue_reactivity_015',
+    topicId: 'topic_vue_reactivity',
+    question: 'Что делает toValue и как он связан с unref/toRef?',
+    answer:
+      '<p>toValue - утилита нормализации (3.3+), приводящая значение, ref или геттер к простому значению. Для гибких composables.</p><p>Что делает: toValue(1) → 1 (значение как есть); toValue(ref(1)) → 1 (разворачивает ref); toValue(() =&gt; 1) → 1 (вызывает геттер, возвращает результат). Нормализует три вида источника в значение.</p><p>Отличие от unref: unref(x) разворачивает ref (isRef(x) ? x.value : x), но НЕ обрабатывает геттеры (функцию вернёт как есть); toValue(x) - то же плюс вызывает геттеры. toValue = unref + обработка геттеров.</p><p>Зачем - гибкие composables: composable должен принимать аргумент в любом виде (значение, ref, геттер), toValue нормализует внутри: function useFeature(id: MaybeRefOrGetter&lt;number&gt;) { watch(() =&gt; toValue(id), (id) =&gt; {}) }. Поддерживает useFeature(1), useFeature(ref(1)), useFeature(() =&gt; props.foo). MaybeRefOrGetter&lt;T&gt; (3.3+) - встроенный тип T | Ref&lt;T&gt; | (() =&gt; T).</p><p>Критичный нюанс - трекинг: watchEffect(() =&gt; { fetch(toValue(url)) }) - toValue ВНУТРИ эффекта, зависимости трекаются. Если composable создаёт реактивные эффекты, toValue вызывать внутри watch-геттера или watchEffect-колбэка - реактивные зависимости геттера правильно трекаются. Если url строка (нет зависимостей) - раз; если ref/геттер - перезапуск при изменении.</p><p>Связь с toRef (обратная): toValue нормализует → значение (как unref); toRef (3.3+) нормализует → ref (как ref). Отношение toRef↔toValue как ref↔unref с геттерами. toRef(() =&gt; props.foo) → readonly ref; toValue(() =&gt; props.foo) → значение сейчас.</p><p>Преимущество геттеров: раньше лишние промежуточные ref (useFeature(computed(() =&gt; props.foo)), useFeature(toRef(props, "foo"))); теперь эффективнее useFeature(() =&gt; props.foo).</p><p>Нюансы: toValue (value/ref/getter → значение, 3.3+); vs unref (плюс вызов геттеров); MaybeRefOrGetter&lt;T&gt; (тип гибких аргументов); трекинг (внутри watch/watchEffect); toRef ↔ toValue (как ref ↔ unref); геттеры эффективнее computed/toRef.</p><p>Vue 2 → 3: toValue/MaybeRefOrGetter - Vue 3.3+; в Vue 2 не было (концепция с Composition API).</p>',
+    order: 15,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Vue: Vue: Composition API и script setup
+  {
+    id: 'q_vue_composition_api_001',
+    topicId: 'topic_vue_composition_api',
+    question: 'Что такое Composition API и какие проблемы Options API он решает?',
+    answer:
+      '<p>Composition API - организация логики компонента через функции композиции (ref, computed, watch, composables) в setup, в противовес Options API, где логика разложена по опциям (data, methods, computed, watch).</p><p>Проблемы Options API, которые решает Composition API:</p><ol><li>Фрагментация логики одной фичи (главная): части одной функциональности размазаны по data/computed/methods/watch; для сложного компонента код фичи разбросан, приходится прыгать между секциями. Composition группирует всю логику фичи вместе - масштабируется на большие компоненты</li><li>Плохое переиспользование: в Options - через mixins с проблемами (коллизии имён, неясный источник свойств). Composition даёт composables - обычные функции с реактивным состоянием, чисто переиспользуемые</li><li>Ограничения TypeScript: Options плохо типизировался (сложный тип this). Composition - обычные переменные и функции, TS выводит естественно</li><li>Проблема this: в Options всё через this.x (нюансы контекста, стрелочные функции). В Composition this почти не используется</li><li>Bundle/оптимизация: лучше tree-shaking (импорт только используемых функций), переменные легче минифицируются</li></ol><p>Оговорки: Options API не устарел (поддерживается, хорош для простых компонентов и ООП-фона); Composition не заменяет, а дополняет (ценен в больших приложениях и переиспользовании); не смешивают без нужды.</p><p>Vue 2 → 3: Composition API появился в Vue 3 (и в 2.7 / через плагин) как ответ на боль масштабирования Options в крупных Vue-2-проектах (размазанная логика, конфликты mixins, страдающий TS). Vue 3 сделал его первоклассным и построил вокруг реактивность.</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_002',
+    topicId: 'topic_vue_composition_api',
+    question: 'Что такое composables и чем они лучше mixins и HOC?',
+    answer:
+      '<p>Composables - функции, инкапсулирующие и переиспользующие stateful-логику через Composition API. Замена mixins в Vue 3.</p><p>Composable: обычная функция (конвенция use*), использующая Composition API внутри (реактивное состояние, хуки, эффекты) и возвращающая реактивные значения/методы. Пример useMouse() создаёт x/y (ref), вешает mousemove в onMounted, снимает в onUnmounted, возвращает { x, y }. Компонент вызывает в setup, можно комбинировать несколько.</p><p>Проблемы mixins, которые решают composables:</p><ol><li>Конфликты имён: два mixin с одинаковым свойством перетирают друг друга без защиты. Composable возвращает значения, имена даёшь сам (const { x: mouseX } = useMouse()) - конфликтов нет</li><li>Неясный источник: с mixin непонятно, откуда someValue в шаблоне. Composable явный: const { x } = useMouse() показывает источник</li><li>Неявные зависимости между mixin (хрупкие скрытые связи). Composable принимает зависимости через аргументы, возвращает результат - чистый контракт</li></ol><p>Проблемы HOC, которые решают composables: HOC (оборачивание компонента) даёт wrapper hell (вложенность обёрток), проброс пропсов, накладные расходы. Composable не создаёт обёрток - вызов функции в setup без изменения дерева.</p><p>Почему чисто: каждый вызов создаёт свежий экземпляр состояния (свои ref), привязанный к компоненту; хуки регистрируются на вызыватель, эффекты очищаются при размонтировании (effect scope). Композиция функций, а не наследование/слияние/оборачивание.</p><p>Нюансы: именование use*; вызывать синхронно в setup (для привязки хуков и inject); аргументы как MaybeRefOrGetter + toValue; возвращать ref/toRefs для реактивности при деструктуризации.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_004',
+    topicId: 'topic_vue_composition_api',
+    question: 'Что такое <script setup> и какой сахар он даёт?',
+    answer:
+      '<p>&lt;script setup&gt; - компиляционный сахар для Composition API в SFC: короче, производительнее, лучше типизируется. Весь код - тело setup, компилируемое при сборке; объявленное автоматически доступно в шаблоне.</p><p>Что даёт:</p><ol><li>Автораскрытие в шаблон: переменные/функции/импорты верхнего уровня сразу в шаблоне без return</li><li>Импорты в шаблоне напрямую: компоненты используются без регистрации в components (import MyComp + &lt;MyComp /&gt;)</li><li>Компиляторные макросы (не импортируются, только при компиляции): defineProps, defineEmits, defineExpose, defineModel (3.4+), defineOptions, defineSlots</li><li>Лучшая производительность: эффективнее скомпилированный код, прямой доступ к переменным в шаблоне</li><li>Лучшая типизация: defineProps&lt;T&gt;()/defineEmits&lt;T&gt;() с дженериками</li></ol><p>Нюансы:</p><ul><li>Компонент по умолчанию ЗАКРЫТ: не раскрывает переменные наружу (родитель через ref не видит внутренности) - нужен defineExpose({...}). Лучше для инкапсуляции</li><li>Reactive Props Destructure (3.5+): const { count } = defineProps(["count"]) сохраняет реактивность (компилятор подставляет props.count); дефолты нативно const { msg = "hello" } = defineProps&lt;{ msg?: string }&gt;(). Чтобы watch или передать в composable - обернуть в геттер (watch(() =&gt; count)); прямая передача теряет реактивность. До 3.4 нужен был toRefs/withDefaults</li><li>useTemplateRef (3.5+): const el = useTemplateRef("myEl") вместо ref(null) + совпадение имени; яснее и работает в composables</li><li>useId (3.5+): уникальный ID, стабильный между сервером и клиентом - избегает hydration mismatch, для id/for/aria</li><li>Top-level await: делает компонент async, требует &lt;Suspense&gt;</li></ul>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_005',
+    topicId: 'topic_vue_composition_api',
+    question: 'Как работают defineProps и defineEmits?',
+    answer:
+      '<p>Компиляторные макросы script setup для объявления входных пропсов и исходящих событий - контракт компонента с родителем.</p><p>defineProps - два способа: runtime (объект с type/required/default/validator, рантайм-валидация) или type-based (дженерик defineProps&lt;{...}&gt;(), чище для TS, выводит рантайм-опции; нельзя оба сразу). Дефолты type-based: withDefaults(defineProps&lt;T&gt;(), {...}) до 3.5 или нативная деструктуризация 3.5+ (const { count = 0 } = defineProps&lt;T&gt;()). Дефолт объекта/массива - фабрикой (default: () =&gt; []), иначе инстансы разделят ссылку.</p><p>Валидация (runtime, только dev): type (конструктор или массив [String, Number]); required; default; validator: (value) =&gt; boolean.</p><p>One-way data flow: пропсы однонаправлены (родитель → потомок), потомок НЕ мутирует проп напрямую (предупреждение, перезатрётся при изменении родителя). Нужно локально менять - computed на основе пропа, локальная копия ref(props.x), или эмит события / defineModel.</p><p>defineEmits: const emit = defineEmits(["change"]) или type-based defineEmits&lt;{ change: [id: number] }&gt;() (tuple-синтаксис 3.3+). Возвращает функцию emit; type-based типизирует имена событий и аргументы; runtime-валидация через объект валидаторов.</p><p>Почему макросы: не импортируются, не существуют в рантайме - компилятор превращает в опции props/emits. Ограничение: аргументы не могут ссылаться на переменные из script setup (выражение выносится наружу при компиляции).</p><p>Vue 2 → 3: во Vue 2 события эмитились через this.$emit без объявления; Vue 3 ввёл явное объявление (emits/defineEmits) - документирует контракт, даёт валидацию, убирает событие из fallthrough-атрибутов.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_006',
+    topicId: 'topic_vue_composition_api',
+    question: 'Что такое defineModel и как эволюционировал v-model в компонентах?',
+    answer:
+      '<p>defineModel (стабилен с 3.4) - макрос для двустороннего биндинга пропа через v-model. Упростил кастомный v-model.</p><p>Проблема: v-model на компоненте - сахар над «проп + событие обновления»; компонент принимает проп и эмитит событие при изменении.</p><p>Эволюция:</p><ul><li>Vue 2: v-model использовал проп value и событие input; кастомизация через опцию model: { prop, event }; только ОДИН v-model</li><li>Vue 3 до 3.4: проп modelValue и событие update:modelValue; плюс множественные v-model через аргумент (v-model:title → проп title + событие update:title); минус - многословно (проп, эмит, ручная связка)</li></ul><p>Vue 3.4+ defineModel: const model = defineModel() (проп modelValue + событие update:modelValue); model.value = "new" автоматически эмитит. Именованный: defineModel("title"); с опциями defineModel("count", { type: Number, default: 0 }). Возвращает ref: читается как значение пропа (синхрон с родителем), при записи автоматически эмитит update:... Работаешь с ref как с локальным состоянием, двусторонняя связь из коробки.</p><p>Модификаторы: const [model, modifiers] = defineModel() - второй элемент даёт модификаторы (v-model.trim → modifiers.trim); опции get/set трансформируют значение (set(value) { return modifiers.trim ? value.trim() : value }).</p><p>Типизация: defineModel&lt;string&gt;() → Ref&lt;string | undefined&gt;; defineModel&lt;string&gt;({ required: true }) → Ref&lt;string&gt;.</p><p>Нюансы: требует сборки (макрос), в script setup; возвращаемый ref - живой мост к родителю (запись = эмит, изменение родителя = обновление ref); с дефолтами есть нюансы синхронизации начального значения.</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_007',
+    topicId: 'topic_vue_composition_api',
+    question: 'Что такое defineExpose и зачем он нужен?',
+    answer:
+      '<p>defineExpose - макрос, явно раскрывающий свойства/методы компонента наружу для доступа родителя через template ref. Нужен, т.к. script setup-компоненты по умолчанию закрыты.</p><p>Проблема: обычный компонент (Options API) раскрывает методы/данные наружу (родитель через ref вызывает childRef.value.method()). Но script setup по умолчанию ЗАКРЫТ - внутренние переменные и функции не видны родителю через ref (осознанная инкапсуляция).</p><p>Решение: defineExpose({ reset, count }) - объект того, что доступно через template ref родителя; не переданное остаётся приватным. Родитель: const child = useTemplateRef("child"); child.value.reset() доступно, child.value.increment() (не раскрыт) - нет.</p><p>Зачем:</p><ul><li>Императивные методы: родителю нужно управлять потомком - formRef.validate(), modalRef.open(), videoRef.play(), inputRef.focus()</li><li>Доступ к внутреннему состоянию (реже, readonly)</li><li>Библиотеки компонентов раскрывают публичный API через defineExpose</li></ul><p>Почему закрытость хороша: инкапсуляция (родитель видит только явный публичный интерфейс, как public/private в ООП; меньше связанность - можно менять внутренности); явный контракт (defineExpose документирует намеренно предоставленное).</p><p>Нюансы: раскрытые ref разворачиваются при доступе (родитель видит значение); вызывается синхронно в script setup; в Options API аналог не нужен (всё публично); комбинируется с useTemplateRef (3.5+) у родителя; типизация через компилятор / ComponentExposed.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_008',
+    topicId: 'topic_vue_composition_api',
+    question: 'Что делают useAttrs, useSlots и связанные утилиты?',
+    answer:
+      '<p>useAttrs и useSlots - функции Composition API для доступа к fallthrough-атрибутам и слотам в setup (эквивалент this.$attrs и this.$slots).</p><p>useAttrs - fallthrough-атрибуты: атрибуты и слушатели, переданные компоненту, но НЕ объявленные в defineProps/defineEmits (class, style, id, data-*, v-on). По умолчанию Vue авто-применяет их к корневому элементу. useAttrs() нужен, когда: применить вручную к не-корневому элементу (input в обёртке); несколько корневых узлов (авто-применение не работает, нужен v-bind="attrs"); обработать/отфильтровать.</p><p>Паттерн обёртки: defineOptions({ inheritAttrs: false }) отключает авто-применение к корню, затем &lt;input v-bind="attrs" /&gt; применяет к input, а не к div.</p><p>useSlots - доступ к слотам: slots.default, slots.header - функции рендера, возвращающие VNode. Частый кейс - проверить наличие слота для условного рендера: const hasHeader = computed(() =&gt; !!slots.header). Нужен в render-функциях/JSX; в обычном шаблоне слоты через &lt;slot&gt; напрямую.</p><p>Нюансы: в script setup дают attrs/slots без context (в опции setup они через второй аргумент); attrs нельзя деструктурировать (потеряет обновления) - через attrs.x; class/style в attrs объединяются с корневыми; объявленные пропсы/эмиты исключаются из attrs.</p><p>Vue 2 → 3: во Vue 2 $attrs не включал class/style и слушатели (был отдельный $listeners). Vue 3 объединил всё в $attrs (class, style, v-on-слушатели), $listeners удалён - упростило модель fallthrough.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_009',
+    topicId: 'topic_vue_composition_api',
+    question:
+      'В каком порядке выполняется код в Composition API и как связаны хуки жизненного цикла?',
+    answer:
+      '<p>Порядок выполнения setup относительно жизненного цикла и регистрация хуков.</p><p>Тайминг setup: выполняется самым первым - до создания инстанса, до beforeCreate и created. Порядок с Options-хуками: setup → beforeCreate → created. Поэтому нет this.</p><p>Регистрация хуков: функции, вызываемые в setup, регистрируют колбэк на фазу. Соответствие: mounted → onMounted, updated → onUpdated, beforeUnmount → onBeforeUnmount, unmounted → onUnmounted, errorCaptured → onErrorCaptured, плюс onActivated/onDeactivated (keep-alive), onServerPrefetch (SSR). Нет onBeforeCreate/onCreated - их роль играет код setup.</p><p>Синхронная регистрация: хуки регистрируются синхронно в setup (Vue привязывает к текущему активному инстансу). После await или в асинхронном колбэке привязка теряется - хук не сработает (частый баг). То же для composables - вызывать синхронно.</p><p>Порядок родитель↔потомок:</p><ul><li>Монтирование: beforeMount родителя → beforeMount потомка → mounted потомка → mounted родителя. mounted потомка РАНЬШЕ mounted родителя (родитель не смонтирован, пока не смонтированы дети)</li><li>Обновление: beforeUpdate родителя → потомка → updated потомка → родителя</li><li>Размонтирование: beforeUnmount родителя → потомка → unmounted потомка → родителя</li></ul><p>Принцип: before-хуки - родитель раньше потомка; завершающие (mounted/updated/unmounted) - потомок раньше родителя. Родитель оборачивает детей.</p><p>Несколько хуков одного типа выполняются в порядке регистрации (composables добавляют свои).</p><p>Практика: логика без DOM - в теле setup (роль created); с DOM (измерения, DOM-библиотеки) - в onMounted; очистка - в onUnmounted; всё синхронно.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_010',
+    topicId: 'topic_vue_composition_api',
+    question: 'Как типизировать компоненты в Composition API (props, emits, slots, expose)?',
+    answer:
+      '<p>Системная типизация компонента в TS с Composition API.</p><p>Props: type-based defineProps&lt;{ title: string; count?: number }&gt;() (предпочтительно, компилятор выводит рантайм-опции). Дефолты: withDefaults(defineProps&lt;Props&gt;(), { count: 0 }) до 3.5 или деструктуризация 3.5+. Ограничения: тип статически разрешим (интерфейс/литерал/импортированный с 3.3), но не сложные условные типы для всего объекта. Можно вынести interface Props.</p><p>Emits: defineEmits&lt;{ change: [id: number]; update: [value: string] }&gt;() - tuple-синтаксис (3.3+), читаемее старого вызовного. Типобезопасность имён и аргументов.</p><p>Slots (defineSlots, 3.3+): defineSlots&lt;{ default(props: { item: string }): any }&gt;() - типизирует имена слотов и scoped-пропсы; для типобезопасных scoped slots.</p><p>Expose: компилятор выводит тип раскрытого; снаружи InstanceType&lt;typeof Component&gt; или ComponentExposed для точного типа; template ref: ref&lt;InstanceType&lt;typeof Child&gt; | null&gt;(null) даёт автодополнение методов.</p><p>Template refs: DOM - ref&lt;HTMLInputElement | null&gt;(null) или useTemplateRef&lt;HTMLInputElement&gt;("myInput") (3.5+); компонент - ref&lt;InstanceType&lt;typeof ChildComp&gt; | null&gt;(null).</p><p>Дженерик-компоненты (3.3+): &lt;script setup lang="ts" generic="T"&gt; - тип T выводится из пропсов; для переиспользуемых типобезопасных компонентов (списки, таблицы, селекты).</p><p>Прочее: defineOptions (3.3+) - name/inheritAttrs в script setup; PropType для runtime-declaration сложных типов (items: { type: Array as PropType&lt;Item[]&gt; }); типы props/emits переиспользуются через экспорт интерфейсов.</p><p>Стек: script setup lang="ts" + type-based defineProps/defineEmits + defineSlots + useTemplateRef/InstanceType + generic="T".</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_composition_api_011',
+    topicId: 'topic_vue_composition_api',
+    question: 'Как создаётся экземпляр приложения Vue и что даёт app-level API?',
+    answer:
+      '<p>Создание экземпляра (createApp) и app-level конфигурация - база любого Vue-приложения.</p><p>Создание (Vue 3): import { createApp } from "vue"; const app = createApp(App); app.mount("#app"). 1) корневой компонент (App); 2) createApp(App) - экземпляр приложения (принимает корневой); 3) app.mount("#app") - монтирует в DOM (селектор или элемент).</p><p>App-level API: app.use(router) (плагин - роутер, Pinia, UI); app.component("GlobalBtn", Button) (глобальный компонент, везде без импорта); app.directive("focus", {}) (глобальная директива); app.provide("key", value) (app-level provide для всех через inject); app.config.errorHandler = (err) =&gt; {} (глобальный обработчик ошибок); app.config.globalProperties.$http = axios (глобальное свойство). Методы чейнятся: createApp(App).use(router).mount("#app"). app.config: errorHandler, warnHandler, globalProperties, performance, compilerOptions.</p><p>Множественные экземпляры: несколько независимых на странице (createApp(App1).mount("#a"), createApp(App2).mount("#b")) - каждый со своей конфигурацией, плагинами, глобальными компонентами. Изоляция. В Vue 2 глобальная конфигурация на Vue (конструктор) - влияла на все (загрязнение); Vue 3 изолировал в экземпляр.</p><p>globalProperties: app.config.globalProperties.$http = axios; в компоненте this.$http (Options). Аналог Vue.prototype.$x из Vue 2. Осторожно (неявные зависимости); в Composition API лучше provide/inject или composables.</p><p>Vue 2 (контраст): new Vue({ render: h =&gt; h(App) }).$mount("#app"). Глобальное: Vue.use(), Vue.component(), Vue.prototype.$x на конструкторе Vue (все экземпляры).</p><p>Связь с Nuxt: createApp/mount скрыты (фреймворк сам). App-level настройка через плагины (defineNuxtPlugin, nuxtApp.vueApp.use()/.component()/.directive()). nuxtApp.vueApp - тот самый экземпляр.</p><p>Нюансы: createApp(App) + mount("#app"); app-level API (use/component/directive/provide/config); изоляция экземпляра (не глобально); множественные экземпляры; globalProperties (осторожно); в Nuxt через плагины.</p><p>Vue 2 → 3: Vue 2 - new Vue({ render }) + $mount, глобальная настройка на Vue (все экземпляры); Vue 3 - createApp(App) + mount, изолирована в экземпляре (нет загрязнения, множественные приложения). Ключевое изменение.</p>',
+    order: 11,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Vue: Компоненты
+  {
+    id: 'q_vue_components_001',
+    topicId: 'topic_vue_components',
+    question: 'Как работают props: валидация, one-way flow, иммутабельность?',
+    answer:
+      '<p>Props - передача данных от родителя к потомку, основа композиции. Фокус на потоке данных, валидации, иммутабельности.</p><p>One-way data flow: props текут строго сверху вниз (родитель → потомок); родитель меняет проп - обновляется у потомка, не наоборот. Предотвращает случайную мутацию родительского состояния из детей; один источник истины, предсказуемый поток.</p><p>Иммутабельность: потомок НЕ должен мутировать props (props.count++ - предупреждение). Почему: при ре-рендере родитель перезапишет локально изменённое значение; ломает предсказуемость. Мутация вложенных свойств объекта-пропа не даёт предупреждения, но всё равно плохо (мутируешь объект родителя).</p><p>Вместо мутации:</p><ol><li>Локальная копия: const count = ref(props.initialCount)</li><li>Computed на основе пропа: computed(() =&gt; props.size.trim())</li><li>Эмит события родителю (изменить источник) или defineModel/v-model</li></ol><p>Валидация: type (конструктор или массив), required, default (для объектов/массивов - фабрикой), validator: (value) =&gt; boolean. Только в dev, в проде отключена.</p><p>Нюансы: Boolean casting (&lt;Child disabled /&gt; без значения = true, как HTML; отсутствие = false); camelCase в JS (myProp) ↔ kebab-case в HTML (my-prop) сопоставляются; объект/массив передаётся ссылкой (потомок может дотянуться до мутации, но не должен); v-bind="obj" передаёт все свойства как пропсы.</p><p>Vue 2 → 3: концепция одинакова; отличия - объявление (defineProps), class/style теперь в $attrs, убран .sync в пользу v-model:arg.</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_002',
+    topicId: 'topic_vue_components',
+    question: 'Как работают события компонентов (emits) и почему их стоит объявлять?',
+    answer:
+      '<p>События - коммуникация потомок → родитель (снизу вверх), дополняют props (сверху вниз).</p><p>Механизм: потомок emit(name, ...args) (const emit = defineEmits(["submit"]); emit("submit", { id: 1 })); родитель слушает @event (&lt;Child @submit="handle" /&gt;), получая аргументы. Обратная связь: props вниз, события вверх - замыкают цикл (родитель меняет стейт в ответ, обновлённые props идут вниз).</p><p>Почему объявлять:</p><ol><li>Документирование контракта: явный список событий - самодокументируемый интерфейс</li><li>Валидация: defineEmits({ submit: (payload) =&gt; ... }) проверяет payload (предупреждение в dev)</li><li>Разделение событий и fallthrough (ключевое техническое): необъявленное событие Vue считает fallthrough-атрибутом и навешивает слушатель на корневой элемент как нативный DOM-слушатель - может сработать ДВАЖДЫ. Объявление в emits перехватывает событие (исключает из $attrs). Пример: компонент с &lt;button&gt; в корне и @click без объявления click - слушатель родителя навесится на корень И сработает от эмита</li><li>Типизация: defineEmits&lt;T&gt;()</li></ol><p>Нюансы: эмит camelCase (emit("myEvent")), слушают kebab-case (@my-event); события НЕ всплывают через дерево компонентов как DOM (только к прямому родителю; для дальней связи - provide/inject, стор); update:xxx - конвенция v-model; payload - любые аргументы.</p><p>Vue 2 → 3: во Vue 2 события не объявлялись (this.$emit без декларации); Vue 3 ввёл явное объявление (контракт, валидация, разделение от fallthrough); убрал $on/$off/$emit инстанса (event bus) - для шины внешние библиотеки/стор.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_003',
+    topicId: 'topic_vue_components',
+    question: 'Как работают слоты (slots): default, named, scoped?',
+    answer:
+      '<p>Слоты - распределение контента: родитель передаёт разметку внутрь компонента, компонент вставляет через &lt;slot&gt;. Основа гибких компонентов-контейнеров.</p><p>Default slot: &lt;slot&gt;&lt;/slot&gt; - точка вставки; контент между тегами компонента вставляется на место slot. Fallback-контент внутри &lt;slot&gt;дефолт&lt;/slot&gt; показывается, если ничего не передано.</p><p>Named slots: несколько слотов по name (&lt;slot name="header"&gt;); родитель направляет через &lt;template #header&gt; (сокращение v-slot:header); слот без имени - default. Несколько точек вставки (шапка, тело, подвал).</p><p>Scoped slots (важнейшее): слот-контент рендерится в области родителя без доступа к данным потомка; scoped slots решают - потомок передаёт данные обратно: &lt;slot :item="item"&gt; (slot props), родитель принимает #default="{ item, index }" (деструктуризация). Зачем: компонент управляет логикой/данными (список, таблица), родитель - представлением каждого элемента. Паттерн для headless/renderless-компонентов.</p><p>Синтаксис: полный v-slot:header="slotProps"; сокращённый #header="slotProps"; default scoped v-slot="slotProps" на компоненте; динамические имена #[dynamicName].</p><p>Нюансы: слот-контент компилируется в scope родителя (доступ к его данным, к данным потомка только через slot props); проверка наличия $slots.header для условной обёртки; слоты - функции под капотом (возвращают VNode); в render-функциях slots.default(), slots.header(props).</p><p>Vue 2 → 3: Vue 2 имел раздельный синтаксис (slot="name" атрибут и slot-scope) - устаревший; Vue 3 унифицировал в v-slot (#) на template, включая scoped; все слоты стали scoped-функциями - единая модель.</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_004',
+    topicId: 'topic_vue_components',
+    question: 'Как работает provide/inject и в чём его преимущества?',
+    answer:
+      '<p>provide/inject - внедрение зависимостей: предок предоставляет данные, любой потомок в поддереве получает их, минуя промежуточные компоненты. Решает prop drilling.</p><p>Проблема prop drilling: чтобы передать данные глубоко вложенному потомку через props, прокидываешь через все промежуточные компоненты, даже если им не нужно (A → B → C → D, данные нужны в D, но B и C вынуждены передавать).</p><p>Решение: provide("theme", theme) в предке - значение доступно поддереву; inject("theme") в потомке - получает независимо от глубины; inject("theme", "light") с дефолтом. Промежуточные ничего не знают.</p><p>Реактивность: предоставить реактивное значение (ref/reactive) - потомки получат реактивную связь; предоставлять сам ref, не выдернутое. Паттерн защиты: provide("theme", readonly(theme)) + provide("setTheme", (t) =&gt; theme.value = t) - потомки читают, меняют через методы (однонаправленный поток, иначе любой потомок мутирует общее состояние - хаос).</p><p>Типизация InjectionKey (TS): const themeKey: InjectionKey&lt;Ref&lt;string&gt;&gt; = Symbol("theme"); синхронизирует тип между provide и inject (ключ знает тип); Symbol избегает коллизий имён (в отличие от строк).</p><p>Уровень приложения: app.provide("key", value) - доступно всем компонентам (плагины, глобальные сервисы).</p><p>Нюансы: provide синхронно в setup (привязка к инстансу); область - только вниз по дереву; ближайший предок выигрывает; не замена Pinia (DI и prop drilling, не централизованный стор).</p><p>Преимущества: устраняет prop drilling; развязывает компоненты; основа паттернов Tabs/Tab, плагинов, DI.</p><p>Vue 2 → 3: инъекции в Vue 2 не были реактивными по умолчанию; Vue 3 делает реактивность естественной + типизация InjectionKey.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_005',
+    topicId: 'topic_vue_components',
+    question: 'Как работают fallthrough-атрибуты и inheritAttrs?',
+    answer:
+      '<p>Fallthrough-атрибуты - атрибуты и слушатели, переданные компоненту, но не объявленные как props/emits, автоматически применяются к корневому элементу.</p><p>Пример: &lt;MyButton class="primary" id="submit" @focus="onFocus" /&gt; - class, id, @focus не объявлены в defineProps/defineEmits, Vue пробрасывает их на корневой &lt;button&gt;.</p><p>Что входит: любые HTML-атрибуты (id, title, data-*, aria-*, role); class и style (МЕРЖАТСЯ с корневыми, не перезаписывают); v-on-слушатели (если не объявлены как emits).</p><p>inheritAttrs: false - отключить авто-применение: defineOptions({ inheritAttrs: false }); const attrs = useAttrs(); затем &lt;input v-bind="attrs" /&gt; применяет вручную. По умолчанию inheritAttrs: true. Главный кейс - обёртки: обёртка над input, где корень div, но class/placeholder/слушатели должны попасть на внутренний input, а не на div.</p><p>Множественные корни: если у компонента несколько корневых элементов, Vue не знает, к какому применить, и не применяет автоматически (плюс предупреждение). Нужен явный v-bind="$attrs" на нужном элементе. Следствие фрагментов Vue 3 (несколько корней).</p><p>Доступ: в шаблоне $attrs; в script setup useAttrs(); в setup(props, { attrs }).</p><p>Сценарии: компоненты-обёртки (кастомный input/button) - inheritAttrs: false + v-bind на внутренний элемент; прозрачные обёртки; сохранение class/style на нужном элементе.</p><p>Vue 2 → 3: Vue 2 $attrs не включал class/style (шли на корень) и слушатели ($listeners отдельно), один корень; Vue 3 объединил class/style/слушатели в $attrs, $listeners удалён, разрешил фрагменты (потребовало явного v-bind="$attrs").</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_006',
+    topicId: 'topic_vue_components',
+    question: 'Что такое динамические компоненты (<component :is>)?',
+    answer:
+      '<p>Динамические компоненты переключают рендерящийся компонент во время выполнения через &lt;component&gt; с атрибутом :is. Основа табов, визардов, условного рендеринга.</p><p>Синтаксис: &lt;component :is="currentComponent" /&gt;. :is принимает: объект компонента (:is="TabA"); строку-имя зарегистрированного (:is="\'TabA\'"); HTML-тег как строку (:is="\'div\'").</p><p>Пример табов: const tabs = { home: TabHome, profile: TabProfile }; const current = ref("home"); &lt;component :is="tabs[current]" /&gt;. При смене current старый компонент размонтируется, новый монтируется.</p><p>Нюансы:</p><ul><li>Пересоздание при переключении: по умолчанию старый компонент уничтожается (unmount), новый создаётся (mount) - состояние теряется. Для сохранения оборачивают в &lt;KeepAlive&gt; (неактивные кешируются)</li><li>Передача props/событий: &lt;component :is="..." v-bind="props" @event="handler" /&gt; как обычно</li><li>:is с HTML-элементами: &lt;component :is="headingLevel" /&gt; где headingLevel = "h1"/"h2" - динамические заголовки</li><li>Регистрация: при имени-строке компонент должен быть доступен; безопаснее передавать сам объект (:is="componentRef"), особенно в script setup</li></ul><p>Асинхронные: :is комбинируется с defineAsyncComponent - подгрузка по требованию.</p><p>Применения: табы (вместо кучи v-if); визарды/многошаговые формы; динамические формы/CMS (тип блока → компонент); условный рендеринг множества вариантов (чище цепочки v-if).</p><p>Vue 2 → 3: работал и в Vue 2; в Vue 3 в script setup удобнее передавать импортированный объект напрямую; механика та же.</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_007',
+    topicId: 'topic_vue_components',
+    question: 'Что такое <KeepAlive> и как он работает?',
+    answer:
+      '<p>&lt;KeepAlive&gt; - встроенный компонент, кеширующий экземпляры при переключении вместо уничтожения/пересоздания. Сохраняет состояние, избегает повторного рендеринга.</p><p>Проблема: при переключении &lt;component :is&gt; или роутов старый компонент уничтожается, при возврате создаётся заново - потеря состояния (текст, скролл, данные), повторные запросы. Плохой UX для табов/визардов.</p><p>Решение: &lt;KeepAlive&gt;&lt;component :is="currentTab" /&gt;&lt;/KeepAlive&gt;. Неактивный компонент не уничтожается, а кешируется (со своим состоянием); при возврате восстанавливается мгновенно.</p><p>Хуки: компонент не монтируется/размонтируется, а активируется/деактивируется - обычные mounted/unmounted НЕ вызываются при переключении. Вместо них onActivated (стал активным, восстановлен) и onDeactivated (скрыт, ушёл в кеш). Логику входа/выхода (таймер, обновление данных) вешают на activated/deactivated. Применяются и ко всем вложенным компонентам.</p><p>Props: include - кешировать только совпадающие имена (строка "TabA,TabB", regex, массив); exclude - не кешировать совпадающие; max - максимум инстансов (:max="10", вытеснение LRU, защита памяти). Сопоставление по имени компонента.</p><p>Нюансы: только один активный прямой потомок (не для списка); кешированные держатся в памяти (max ограничивает); с Vue Router - кешировать роут-компоненты (&lt;RouterView v-slot="{ Component }"&gt;&lt;KeepAlive&gt;&lt;component :is="Component" /&gt;); порядок вложенности с Transition/Suspense важен (Transition → KeepAlive → Suspense → component).</p><p>Применения: табы с возвратом; визарды (не терять данные шага); кеширование страниц списка (скролл/фильтры).</p><p>Vue 2 → 3: был в Vue 2 с include/exclude/max и activated/deactivated; Vue 3 добавил Composition-хуки onActivated/onDeactivated.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_008',
+    topicId: 'topic_vue_components',
+    question: 'Что такое <Teleport> и зачем он нужен?',
+    answer:
+      '<p>&lt;Teleport&gt; - встроенный компонент, перемещающий контент в другую часть DOM физически вне компонента, сохраняя логическую принадлежность. Решает проблемы стекинга/переполнения для модалок, тултипов.</p><p>Проблема: модалка/тултип логически принадлежат компоненту, но визуально должны быть поверх всего (в конце body). Рендеринг внутри дерева компонента даёт: overflow: hidden родителя обрезает; z-index и stacking context мешают (родитель с transform/opacity создаёт контекст); position: fixed некорректен относительно трансформированного предка.</p><p>Решение: &lt;Teleport to="body"&gt;&lt;div class="modal" v-if="open"&gt;&lt;/Teleport&gt;. to - цель (селектор или элемент); контент физически рендерится в цели (конец body), вне иерархии компонента. Но логически остаётся частью компонента: реактивность, props, provide/inject, слушатели работают. Разрывает связь «логическое положение в дереве» ↔ «физическое в DOM».</p><p>Props: to (цель, обязателен); disabled (true - остаётся на месте, можно динамически - телепортировать только на мобильных); defer (3.5+ - отложить разрешение цели до монтирования других частей; для цели, рендерящейся Vue позже; работает как mounted-хук, цель в тот же tick).</p><p>Нюансы: цель должна существовать при монтировании (кроме defer); inject внутри получает от предков в ДЕРЕВЕ КОМПОНЕНТОВ, не в DOM (отличие от ручного appendChild); несколько Teleport в одну цель накапливаются; SSR требует внимания (гидратация); scoped-стили применяются.</p><p>Применения: модалки (минуя overflow/z-index); тултипы, поповеры, dropdown; нотификации/тосты; оверлеи.</p><p>Vue 2 → 3: новый компонент Vue 3 (в Vue 2 - сторонний portal-vue); defer добавлен в 3.5.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_009',
+    topicId: 'topic_vue_components',
+    question: 'Что такое <Suspense> и как обрабатывать асинхронные компоненты?',
+    answer:
+      '<p>&lt;Suspense&gt; - встроенный компонент для оркестрации асинхронных зависимостей: показывает fallback (загрузку), пока вложенные async-компоненты не разрешатся. Экспериментальный.</p><p>Проблема: компоненты бывают асинхронными (async setup() с top-level await, или defineAsyncComponent). Пока грузятся, нужно показывать загрузку и обработать переход. Вручную для каждого - рутина.</p><p>Решение: &lt;Suspense&gt; с двумя слотами - #default (контент с async-компонентами) и #fallback (пока не разрешены). Suspense ждёт разрешения всех async-зависимостей в default, показывая fallback, затем переключается.</p><p>Async-зависимости: компоненты с async setup() (top-level await в script setup делает компонент async); async-компоненты через defineAsyncComponent.</p><p>defineAsyncComponent: const AsyncComp = defineAsyncComponent(() =&gt; import("./Heavy.vue")). Загружает по требованию (code splitting - отдельный чанк), улучшает начальную загрузку. Опции: loader, loadingComponent, errorComponent, delay, timeout. Работает автономно или внутри Suspense.</p><p>События: @pending (начата загрузка), @resolve (разрешены), @fallback (показан fallback).</p><p>Ошибки: Suspense сам не обрабатывает - onErrorCaptured в родителе или errorComponent. Комбинируют Suspense + error boundary.</p><p>Нюансы: экспериментальный статус (API может меняться); порядок вложенности с Transition/KeepAlive/RouterView важен (RouterView → Transition → KeepAlive → Suspense → component); suspensible делегирует родительскому Suspense; Nuxt использует под капотом для страниц (useAsyncData/useFetch).</p><p>Vue 2 → 3: новый компонент Vue 3; defineAsyncComponent заменил старый синтаксис async-компонентов Vue 2.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_010',
+    topicId: 'topic_vue_components',
+    question: 'Как работают рекурсивные и функциональные компоненты?',
+    answer:
+      '<p>Два специфичных вида: рекурсивные (вызывают сами себя для древовидных структур) и функциональные (без состояния, как чистые функции).</p><p>Рекурсивные компоненты: рендерят сами себя внутри шаблона - для древовидных/вложенных структур (меню с подменю, комментарии с ответами, файловое дерево). TreeNode рендерит &lt;TreeNode v-for="child in node.children" :node="child" /&gt; - вызывает сам себя. Ссылается на себя по имени (в script setup выводится из имени файла автоматически). Критично - условие выхода (v-if="node.children") останавливает рекурсию на листьях, иначе бесконечная рекурсия и переполнение стека (базовый случай). Если имя не выводится - defineOptions({ name: "TreeNode" }).</p><p>Функциональные компоненты: чистая функция без состояния, экземпляра, хуков. function MyComponent(props, { slots, emit, attrs }) { return h("div", props.msg) }; MyComponent.props = ["msg"]. Нет this, реактивного состояния, хуков. Второй аргумент - контекст вместо инстанса. Преимущества: легче и быстрее (нет инстанса, прокси, хуков). Применения: простые презентационные без состояния (иконка, бейдж, ячейка), программный рендеринг.</p><p>Нюансы: Vue 2 → 3 - в Vue 2 объявлялись через functional: true и давали заметный прирост; в Vue 3 оптимизации уменьшили разницу в производительности (обычные компоненты дешевле), синтаксис - просто функция; используются реже. Нет доступа к хукам, состоянию, this; в SFC менее удобны (чаще render-функция h() или JSX).</p><p>Когда: рекурсивные - единственный способ рендерить произвольно вложенные данные (с условием выхода); функциональные - редкая оптимизация stateless-компонентов, в Vue 3 обычно не нужны.</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_011',
+    topicId: 'topic_vue_components',
+    question: 'Как работают <Transition> и <TransitionGroup>?',
+    answer:
+      '<p>Встроенные компоненты для анимации появления, исчезновения и перемещения. Vue управляет классами переходов, анимации на CSS (или JS-хуках).</p><p>&lt;Transition&gt; - один элемент: &lt;Transition name="fade"&gt;&lt;div v-if="show"&gt;&lt;/Transition&gt;. Оборачивает один элемент, управляемый v-if/v-show. Vue навешивает классы в моменты входа/выхода.</p><p>Классы (механика): для name="fade" - вход: fade-enter-from (начальное) → fade-enter-active (в процессе, тут transition) → fade-enter-to (конечное); выход: fade-leave-from → fade-leave-active → fade-leave-to. Vue добавляет -from, на следующем кадре меняет на -to, -active всю анимацию; CSS-transition между -from и -to создаёт эффект. По завершении элемент убирается из DOM.</p><p>Возможности Transition: mode (out-in - старый уходит, потом новый; in-out); appear (анимация первого рендера); кастомные классы (enter-active-class для Animate.css); JS-хуки (@before-enter, @enter, @leave для GSAP; :css="false" отключить CSS).</p><p>&lt;TransitionGroup&gt; - списки: анимация множества элементов в v-for (добавление, удаление, перемещение). Отличия: рендерит обёртку (tag="ul"); каждый элемент обязан иметь key; поддерживает -move класс (list-move) - анимация ПЕРЕМЕЩЕНИЯ при смене позиции (техника FLIP для плавного сдвига соседей).</p><p>Нюансы: Transition - только один корневой элемент; смена key триггерит переход; FLIP-перемещение (-move) для списков (сортировка, фильтрация); анимировать transform/opacity (композитные), не width/top (reflow); порядок вложенности с KeepAlive/Suspense.</p><p>Vue 2 → 3: переименование классов - v-enter → v-enter-from, v-leave → v-leave-from (суффикс -from для ясности); -to и -active остались. Частый подвох миграции.</p>',
+    order: 11,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_012',
+    topicId: 'topic_vue_components',
+    question: 'Как работают template refs и обращение к дочерним компонентам?',
+    answer:
+      '<p>Template refs - прямая ссылка на DOM-элемент или экземпляр дочернего компонента для императивного взаимодействия. Когда декларативного (props/события) недостаточно.</p><p>Ref на DOM: const inputEl = ref(null) с именем, совпадающим с ref="inputEl" в шаблоне; после монтирования inputEl.value - реальный DOM-элемент (inputEl.value.focus() в onMounted).</p><p>useTemplateRef (3.5+): const inputEl = useTemplateRef("inputEl") - по строке-имени; яснее (видно, что template ref, а не данные) и работает в composables.</p><p>Ref на компонент: const childRef = ref(null); &lt;ChildComponent ref="childRef" /&gt;; childRef.value.someMethod(). Но для script setup-компонента доступны только методы из defineExpose (закрытость); для Options API - всё публичное.</p><p>Тайминг: заполняется после монтирования - в setup/до onMounted ещё null; доступ в onMounted и позже, в обработчиках, или после nextTick() (DOM обновляется асинхронно).</p><p>Refs в v-for: собирает массив элементов (ref на массив); порядок не гарантирован идентичным DOM.</p><p>Функциональные refs: :ref="(el) =&gt; {...}" вызывается при монтировании/размонтировании с элементом или null.</p><p>Когда использовать: для недекларативного - фокус (focus()), интеграция со сторонними DOM-библиотеками (карты, чарты, редакторы), императивные методы (formRef.validate(), modalRef.open()), измерение размеров, медиа (video.play()). НЕ использовать для решаемого через props/события/реактивность - escape hatch вразрез с декларативной моделью, усложняет и связывает. Refs - крайняя мера.</p><p>Vue 2 → 3: Vue 2 - this.$refs.name; Vue 3 - ref-переменная или useTemplateRef; дочерние script setup закрыты (нужен defineExpose), в Vue 2 всё через $refs.</p>',
+    order: 12,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_013',
+    topicId: 'topic_vue_components',
+    question: 'Какие есть способы коммуникации между компонентами?',
+    answer:
+      '<p>Системный обзор способов обмена данными - важно знать, когда что выбирать.</p><ol><li>Props (родитель → потомок): передача вниз, декларативный однонаправленный. Когда: прямая передача дочернему</li><li>Events/emits (потомок → родитель): вверх через emit; потомок уведомляет родителя. Props вниз + события вверх = полный цикл прямых связей</li><li>v-model (двусторонняя ↔): сахар над проп + событие (defineModel). Когда: поля ввода, контролы</li><li>provide/inject (предок → поддерево): DI, минуя промежуточные, против prop drilling. Когда: глубина поддерева (тема, локаль, DI), Tabs/Tab</li><li>Template refs (императивный доступ к потомку): childRef.value.method() через defineExpose. Когда: валидация, focus - крайняя мера</li><li>Слоты/scoped slots (данные потомка → родитель): потомок отдаёт данные, родитель определяет разметку. Когда: renderless, кастомизация рендеринга</li><li>Fallthrough-атрибуты ($attrs): прозрачная передача через обёртку. Когда: обёртки</li><li>Pinia (любые компоненты): централизованный стор всем. Когда: состояние между несвязанными компонентами, глобальное (пользователь, корзина)</li><li>Composables с общим состоянием: модуль-синглтон, лёгкая альтернатива стору</li></ol><p>Как выбирать: прямая связь → props + события/v-model; глубоко → provide/inject; несвязанные/глобально → Pinia; рендеринг → слоты; императивное → refs (крайняя мера); обёртки → fallthrough.</p><p>Принцип: минимально достаточный механизм, предпочитать декларативное императивному. Не тянуть стор, где хватает props; не сверлить props через 5 уровней, где уместен inject.</p><p>Vue 2 → 3: Vue 2 имел event bus ($on/$emit инстанса); Vue 3 удалил $on/$off - вместо шины Pinia, provide/inject, сторонние эмиттеры.</p>',
+    order: 13,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_014',
+    topicId: 'topic_vue_components',
+    question: 'Как работают стили компонентов: scoped, :deep, CSS Modules, v-bind в CSS?',
+    answer:
+      '<p>Vue SFC дают механизмы изоляции и динамики стилей на уровне компонента.</p><p>&lt;style scoped&gt; - изоляция: стили только к элементам компонента. Vue добавляет уникальный data-атрибут (data-v-xxxxxx) и дописывает в селекторы (.title[data-v-xxxxxx]). Предотвращает утечку и влияние извне. Специфичность чуть выше (класс + атрибут).</p><p>:deep() - проникновение в дочерние: scoped-стили не затрагивают содержимое дочерних компонентов (другой data-атрибут) - частый вопрос «почему не применился к чайлду». :deep(.child-class) намеренно проникает. Раньше ::v-deep/&gt;&gt;&gt; (устарели). Осознанный прокол изоляции.</p><p>Другие псевдоклассы: :slotted() - стилизовать слот-контент (scoped родителем); :global() - глобальное правило внутри scoped.</p><p>&lt;style module&gt; - CSS Modules: классы локальны (хешируются), доступ через $style.title в шаблоне. Изоляция через уникализацию имён (в отличие от scoped через атрибут). В script setup - useCssModule().</p><p>v-bind в CSS - динамические стили: color: v-bind(color) связывает CSS-свойство с реактивным значением; при изменении color стиль обновляется. Под капотом через CSS-переменные (значение как inline custom property, v-bind компилируется в var(--xxx)) - реактивно и дёшево. Для тем, динамических цветов/размеров без инлайн-стилей.</p><p>Нюансы: scoped + :deep для сторонних/дочерних; комбинация scoped и module возможна; v-bind дёшев (CSS-переменные); :deep точечно (не ломать изоляцию); SSR работает; глобальные - style без scoped/module.</p><p>Vue 2 → 3: scoped и CSS Modules были; v-bind в CSS - НОВАЯ фича Vue 3; проникновение изменилось с &gt;&gt;&gt;/::v-deep (Vue 2) на :deep(), добавлены :slotted(), :global().</p>',
+    order: 14,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_015',
+    topicId: 'topic_vue_components',
+    question: 'Как работает асинхронная загрузка компонентов и code splitting?',
+    answer:
+      '<p>defineAsyncComponent загружает компоненты по требованию отдельными чанками, а не в основном бандле. Инструмент оптимизации размера бандла и начальной загрузки.</p><p>Использование: const AsyncComp = defineAsyncComponent(() =&gt; import("./Heavy.vue")). Принимает loader-функцию с промисом (динамический import()); компонент выделяется сборщиком в отдельный чанк, загружаемый только при первом рендере.</p><p>Code splitting: разбиение бандла на части по необходимости. Зачем: уменьшить начальный бандл (пользователь грузит только код текущего экрана, тяжёлые/редкие компоненты лениво); ускоряет первую загрузку (меньше JS парсить - связь с CRP). Динамический import() - точка разделения.</p><p>Опции: loadingComponent (во время загрузки); errorComponent (при ошибке); delay (задержка перед спиннером, избежать мигания); timeout (→ ошибка); suspensible (управляется родительским Suspense).</p><p>С Suspense: async-компонент управляется единым fallback вместо собственных loading/error.</p><p>Где применять: роут-компоненты (главный кейс - { path: "/dashboard", component: () =&gt; import("./Dashboard.vue") }, самый эффективный splitting по страницам); тяжёлые компоненты (редакторы, чарты, карты); модалки (при первом открытии); условно рендерящиеся за v-if; части ниже сгиба.</p><p>Нюансы: гранулярность (не слишком мелко - оверхед сети, не крупно); prefetch/preload для предзагрузки в простое; именование чанков magic comments; SSR требует внимания (Nuxt управляет); обязательная обработка ошибок сети.</p><p>Vue 2 → 3: Vue 2 - () =&gt; import() напрямую или объект с component-промисом; Vue 3 требует явного defineAsyncComponent, опции сохранились.</p>',
+    order: 15,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_components_016',
+    topicId: 'topic_vue_components',
+    question: 'Какие есть паттерны композиции компонентов (renderless, compound)?',
+    answer:
+      '<p>Архитектурные паттерны построения переиспользуемых компонентов - проектирование компонентных API.</p><p>1) Renderless-компоненты: инкапсулируют логику/поведение, но не рендерят свою разметку - отдают данные через scoped slot, разметку определяет потребитель. MouseTracker с &lt;slot :x="x" :y="y"&gt; без разметки; потребитель &lt;MouseTracker v-slot="{ x, y }"&gt;. Разделение логики (что) и представления (как). Нюанс Vue 3: composables во многом вытеснили renderless (useMouse() легче - нет компонента в дереве, гибче). Renderless остаётся для логики, тесно связанной со слотами/шаблоном; для чистой логики - composable. Инсайт: «renderless или composable?» → обычно composable.</p><p>2) Compound components: набор компонентов как единое целое через provide/inject. &lt;Tabs&gt;&lt;Tab&gt;&lt;/Tabs&gt; - Tabs через provide делится состоянием, Tab через inject потребляют. Чистый декларативный API, координация скрыта. Применения: Tabs/Tab, Accordion/Panel, Select/Option, Menu/MenuItem.</p><p>3) Другие: wrapper/обёртка (оборачивает элемент/компонент с прозрачным пробросом inheritAttrs: false + v-bind="$attrs"); presentational/container (отображение через props/слоты vs логика/данные; в Vue 3 логика уходит в composables); provider-компонент (предоставить контекст поддереву - ThemeProvider); слот-based композиция (гибкие layout на named/scoped слотах).</p><p>Как выбирать: чистая логика → composable (не renderless); логика + рендеринг/слоты → renderless; семейство → compound (provide/inject); расширение элемента → wrapper; контекст поддереву → provider; layout → слоты.</p><p>Принцип: Composition API сместил паттерны к функциям (renderless и HOC реже, composables чаще); compound, wrappers, слот-композиция актуальны. Переиспользуется логика → composable, структура/поведение с рендерингом → компонентный паттерн.</p>',
+    order: 16,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Vue: Жизненный цикл
+  {
+    id: 'q_vue_lifecycle_001',
+    topicId: 'topic_vue_lifecycle',
+    question:
+      'Какие есть хуки жизненного цикла и как они соотносятся между Composition и Options API?',
+    answer:
+      '<p>Жизненный цикл - фазы от создания до уничтожения, на каждую вешается логика через хуки.</p><p>Фазы: создание (инициализация состояния), монтирование (первый рендер и вставка в DOM), обновление (ре-рендер при изменении данных), размонтирование (удаление, очистка).</p><p>Соответствие Options → Composition: beforeCreate/created → код в setup; beforeMount → onBeforeMount; mounted → onMounted; beforeUpdate → onBeforeUpdate; updated → onUpdated; beforeUnmount → onBeforeUnmount; unmounted → onUnmounted; errorCaptured → onErrorCaptured; activated/deactivated → onActivated/onDeactivated (keep-alive); serverPrefetch → onServerPrefetch; renderTracked/renderTriggered → onRenderTracked/onRenderTriggered.</p><p>Что на хуках:</p><ul><li>beforeCreate/created: роль играет код setup (нет onBeforeCreate/onCreated), состояние инициализировано, DOM нет</li><li>onBeforeMount: перед вставкой, DOM нет, редко</li><li>onMounted: вставлен в DOM, DOM доступен (ref, DOM-библиотеки, запросы, подписки, измерения); гарантирует монтирование всех детей</li><li>onBeforeUpdate: перед ре-рендером, DOM ещё старый</li><li>onUpdated: после ре-рендера, DOM обновлён; осторожно - не менять состояние без условия (бесконечный цикл), лучше watch</li><li>onBeforeUnmount: перед удалением, компонент функционален, готовят очистку</li><li>onUnmounted: удалён, эффекты остановлены; финальная очистка - снять слушатели, таймеры, WebSocket, отписки</li></ul><p>Нюансы: Composition-хуки регистрируются в setup синхронно; можно несколько (порядок регистрации); beforeCreate/created без Composition-аналога (setup раньше beforeCreate); при SSR нет mounted/updated (кроме serverPrefetch).</p><p>Vue 2 → 3: beforeDestroy → beforeUnmount, destroyed → unmounted (переименованы); добавлены Composition-версии onXxx.</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_lifecycle_002',
+    topicId: 'topic_vue_lifecycle',
+    question: 'Как устроена фаза монтирования и что доступно в onMounted?',
+    answer:
+      '<p>Углублённый разбор монтирования - что происходит между setup и onMounted.</p><p>Последовательность: setup (создание состояния, регистрация хуков, DOM нет, this нет) → render-функция создаёт Virtual DOM → onBeforeMount → Vue создаёт реальные DOM-узлы и вставляет → рекурсивно монтируются дети → onMounted (компонент и все потомки в DOM).</p><p>Что доступно в onMounted: реальный DOM (template refs указывают на элементы - измерения, позиции, DOM API); дочерние компоненты смонтированы (их DOM/раскрытые методы); весь поддерево отрисовано.</p><p>Что где размещать:</p><ul><li>В теле setup (роль created): инициализация состояния; запуск запросов данных (не нужен DOM, раньше = быстрее); watch/computed; provide, composables; всё без DOM</li><li>В onMounted: доступ к DOM (ref.value - измерения, фокус, скролл); DOM-зависимые библиотеки (карта, чарт, редактор на элементе); DOM-подписки (ResizeObserver, IntersectionObserver); слушатели window/document</li></ul><p>Почему запросы в setup, не onMounted: не требует DOM, запуск раньше = данные быстрее; при SSR onMounted НЕ вызывается на сервере, поэтому SSR-данные - только в setup, не onMounted (связь с Nuxt).</p><p>Тайминг: в onMounted DOM первого рендера готов; при изменении состояния в onMounted обновлённый DOM не сразу - нужен nextTick.</p><p>Ошибки: ref.value в setup (до монтирования) → null; инициализация DOM-библиотеки в setup вместо onMounted → элемента нет; SSR-данные в onMounted → на сервере не выполнится.</p><p>Паттерн: onMounted(() =&gt; chart = new Chart(chartEl.value, config)); onUnmounted(() =&gt; chart?.destroy()). Инстанс библиотеки - в обычной переменной или markRaw (чтобы Vue не проксировал).</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_lifecycle_003',
+    topicId: 'topic_vue_lifecycle',
+    question: 'Что такое nextTick и зачем он нужен?',
+    answer:
+      '<p>nextTick - функция, возвращающая промис, резолвящийся после применения всех запланированных обновлений DOM. Нужна из-за асинхронности обновлений Vue.</p><p>Проблема: Vue не обновляет DOM синхронно при изменении данных - изменения батчатся и применяются асинхронно, в микрозадаче, в конце синхронного кода. Сразу после count.value = 1 DOM ещё отражает старое значение (обновление запланировано, не применено).</p><p>Решение: count.value = 1; await nextTick(); - теперь DOM обновлён. Или nextTick(() =&gt; { DOM обновлён }). Промис резолвится после применения всех обновлений текущего тика.</p><p>Механика через event loop: при изменении данных Vue ставит компонент в очередь обновлений (scheduler); очередь сбрасывается в микрозадаче (Promise.then - микротаск); nextTick подключается к той же микрозадаче, резолвится после сброса (после патча DOM). Синхронный код → микротаск (обновление DOM + резолв nextTick) → следующая макрозадача.</p><p>Когда нужен: работа с обновлённым DOM после изменения (messages.push(); await nextTick(); scrollToBottom()); фокус на новом элементе (showInput = true; await nextTick(); inputRef.value.focus()); измерение размеров после изменения layout; интеграция с библиотеками.</p><p>Формы: await nextTick() (предпочтительно в async); nextTick(() =&gt; {}) (колбэк); this.$nextTick() (Options).</p><p>Связь с flush: watch с flush: "post" запускается после обновления DOM - альтернатива nextTick для реакции на конкретное изменение.</p><p>Vue 2 → 3: работал и в Vue 2 (микрозадачи); в Vue 3 можно импортировать как функцию (не только this.$nextTick). Механика та же.</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_lifecycle_004',
+    topicId: 'topic_vue_lifecycle',
+    question: 'Как правильно делать очистку (cleanup) в жизненном цикле?',
+    answer:
+      '<p>Очистка ресурсов предотвращает утечки памяти и баги от незакрытых подписок/таймеров/слушателей.</p><p>Проблема: если компонент создаёт побочные ресурсы и не убирает при размонтировании, они живут после удаления - держат ссылки (мешая сборке мусора, утечка) и срабатывают (обращаясь к несуществующему компоненту, ошибки).</p><p>Что чистить: слушатели событий (addEventListener на window/document); таймеры (setInterval, setTimeout); подписки (WebSocket, EventSource, RxJS); observers (Intersection/Resize/Mutation); инстансы библиотек (destroy/dispose); requestAnimationFrame.</p><p>Основной паттерн: onMounted(() =&gt; window.addEventListener("resize", onResize)); onUnmounted(() =&gt; window.removeEventListener("resize", onResize)). Парность критична: каждому «создать» - «убрать». onBeforeUnmount - пока компонент функционален; onUnmounted - после удаления.</p><p>Лучший паттерн - composable: function useEventListener(target, event, handler) { onMounted(() =&gt; target.addEventListener(...)); onUnmounted(() =&gt; target.removeEventListener(...)) }. Инкапсулирует setup и teardown - потребитель не забудет очистку (co-location). Так устроен VueUse.</p><p>Очистка эффектов: watch/watchEffect в setup авто-останавливаются при размонтировании; побочные ресурсы внутри - через onCleanup (аргумент) или onWatcherCleanup (3.5+): watch(id, (newId, old, onCleanup) =&gt; { const controller = new AbortController(); fetch(..., { signal }); onCleanup(() =&gt; controller.abort()) }). Критично для гонок (отмена устаревшего запроса).</p><p>onScopeDispose - очистка для effect scope, не компонента (composables вне компонента).</p><p>Нюансы: парность - золотое правило; синхронная регистрация; KeepAlive - при деактивации onUnmounted НЕ вызывается (onDeactivated), unmounted только при реальном удалении из кеша; SSR - подписки/таймеры в setup на сервере могут утекать.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_lifecycle_005',
+    topicId: 'topic_vue_lifecycle',
+    question: 'Как работает обработка ошибок через onErrorCaptured и error boundaries?',
+    answer:
+      '<p>onErrorCaptured - хук, перехватывающий ошибки из потомков (паттерн error boundary).</p><p>onErrorCaptured((err, instance, info) =&gt; {...}): вызывается при ошибке в любом дочернем компоненте на любой глубине. Аргументы: err (объект ошибки); instance (где произошла); info (тип источника - рендер, watcher, хук).</p><p>Распространение: ошибка всплывает вверх по дереву от места возникновения к родителям, ища onErrorCaptured. return false останавливает распространение (не пойдёт выше); без него всплывает к вышестоящим и глобальному обработчику. Локализует обработку - ближайшая граница ловит своё поддерево.</p><p>Error Boundary: компонент-обёртка ловит ошибки потомков, показывает запасной UI: const error = ref(null); onErrorCaptured((err) =&gt; { error.value = err; return false }); в шаблоне v-if="error" fallback, иначе &lt;slot&gt;. Использование &lt;ErrorBoundary&gt;&lt;RiskyComponent /&gt;&lt;/ErrorBoundary&gt; изолирует сбой - остальное работает.</p><p>Что перехватывается: ошибки рендер-функций, хуков жизненного цикла, обработчиков событий, watchers потомков. НЕ перехватываются: async-код (setTimeout, .then) - ловить вручную (try/catch, .catch).</p><p>Глобальный: app.config.errorHandler = (err, instance, info) =&gt; {...} - последний рубеж, все не остановленные ошибки (логирование в Sentry). Иерархия: ошибка → ближайший onErrorCaptured → выше → глобальный errorHandler.</p><p>Нюансы: async-ошибки не ловятся (try/catch); граница не ловит собственные ошибки (только потомков); восстановление - дать «повторить» (сброс/перемонтирование через key); info для диагностики; SSR - ошибки иначе (Nuxt error.vue, showError, createError).</p><p>Vue 2 → 3: errorCaptured и errorHandler были; Vue 3 добавил onErrorCaptured. Концепция та же.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_lifecycle_006',
+    topicId: 'topic_vue_lifecycle',
+    question: 'Как работают хуки при SSR и чем отличается серверный жизненный цикл?',
+    answer:
+      '<p>При SSR жизненный цикл работает иначе: часть хуков не вызывается (на сервере нет DOM и обновлений). Критично для universal-кода.</p><p>Ключевое отличие: SSR рендерит компонент один раз в строку HTML - компонент не живёт, не обновляется, не взаимодействует. Нет DOM, событий, реактивных обновлений на сервере. Поэтому DOM-хуки и хуки обновлений НЕ вызываются.</p><p>Вызываются на сервере: setup (да); beforeCreate/created (да); onServerPrefetch (специальный SSR-хук для загрузки данных, ждёт async перед рендером).</p><p>НЕ вызываются на сервере: onBeforeMount/onMounted (нет DOM - код в onMounted только на клиенте); onBeforeUpdate/onUpdated (нет обновлений); onBeforeUnmount/onUnmounted; onActivated/onDeactivated.</p><p>Следствия:</p><ol><li>DOM-зависимый код - только в onMounted (на сервере не запустится, ошибок нет); window в setup упадёт на сервере</li><li>onMounted как «только клиент» - индикатор клиента</li><li>SSR-данные - в setup/onServerPrefetch, не onMounted (иначе на сервере HTML пустой, загрузка только на клиенте - теряется смысл SSR). В Nuxt - useAsyncData/useFetch</li><li>Очистка на сервере: подписки/таймеры в setup не очищаются (onUnmounted не вызывается) - утечка; лучше в onMounted</li></ol><p>Гидратация: клиент оживляет серверный HTML, навешивая реактивность без повторного рендера; тогда вызывается onMounted (первый раз на клиенте). Hydration mismatch - если серверный рендер не совпал с клиентским (Date.now(), Math.random(), window, разное состояние); код должен давать одинаковый результат.</p><p>Universal-код: setup выполняется на сервере и клиенте (не обращаться к браузерным API); window/localStorage - в onMounted или с проверкой (import.meta.client); useId (3.5+) - стабильный ID между сервером и клиентом.</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_lifecycle_007',
+    topicId: 'topic_vue_lifecycle',
+    question: 'Как работают хуки onActivated/onDeactivated и жизненный цикл в <KeepAlive>?',
+    answer:
+      '<p>В &lt;KeepAlive&gt; жизненный цикл меняется: вместо монтирования/размонтирования - активация/деактивация.</p><p>Как меняется: обычный компонент при скрытии размонтируется (onUnmounted), при показе создаётся заново (setup + onMounted). В KeepAlive компонент не уничтожается, а кешируется:</p><ul><li>Первый показ - обычное setup + onMounted</li><li>Скрытие - НЕ onUnmounted, а onDeactivated (ушёл в кеш, жив)</li><li>Повторный показ - НЕ setup/onMounted, а onActivated (восстановлен)</li><li>Реальное удаление из кеша (вытеснение по max, размонтирование KeepAlive) - onUnmounted</li></ul><p>onActivated: вызывается при каждой активации (и первое монтирование после onMounted, и каждое восстановление). Логика входа - обновить данные, запустить таймер/анимацию, восстановить фокус.</p><p>onDeactivated: при каждой деактивации (скрытии). Логика ухода - остановить таймеры/анимации/видео/поллинг (но НЕ финальная очистка - может вернуться).</p><p>Различие размещения: onMounted/onUnmounted срабатывают только раз (первое/реальное удаление) - одноразовая инициализация/очистка (инстанс библиотеки); onActivated/onDeactivated при каждом входе/выходе - повторяющаяся логика. Баг: обновление данных на onMounted в кешированном компоненте обновит только при первом показе, при возвратах старые (нужен onActivated).</p><p>Порядок: первый показ setup → onBeforeMount → onMounted → onActivated; скрытие onDeactivated; повторный показ onActivated; удаление onUnmounted.</p><p>Нюанс: применяется ко всем вложенным компонентам поддерева.</p><p>Сценарии: обновление при возврате (onActivated); пауза поллинга/видео при уходе (onDeactivated); восстановление скролла; аналитика «просмотр экрана» на onActivated (каждый вход), не onMounted.</p><p>Vue 2 → 3: activated/deactivated были; Vue 3 добавил onActivated/onDeactivated.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_lifecycle_008',
+    topicId: 'topic_vue_lifecycle',
+    question: 'Как отлаживать реактивность и жизненный цикл (onRenderTracked, onRenderTriggered)?',
+    answer:
+      '<p>Отладочные хуки и практики диагностики: почему компонент перерисовывается, какие зависимости это вызвали.</p><p>onRenderTracked: вызывается при отслеживании (track) каждой реактивной зависимости во время рендера - при первом рендере регистрирует все зависимости, которые компонент читает. Показывает, от каких данных зависит рендер. event: target (объект), type (get/has/iterate), key (свойство).</p><p>onRenderTriggered: вызывается, когда зависимость изменилась (trigger) и спровоцировала ре-рендер. Показывает, какое изменение вызвало перерисовку - ключевой инструмент «почему перерисовался?». event: newValue/oldValue.</p><p>Только dev: оба работают только в dev-режиме, в проде не вызываются.</p><p>Для оптимизации: найти лишние ре-рендеры (onRenderTriggered покажет виновное свойство); понять зависимости (onRenderTracked - неожиданные, например читаешь весь объект вместо поля); диагностика с Vue DevTools.</p><p>Другие инструменты: Vue DevTools (дерево компонентов, инспекция состояния, timeline, производительность, Pinia); опции computed/watch onTrack/onTrigger (const double = computed(() =&gt; ..., { onTrack(e) { debugger }, onTrigger(e) { debugger } }) - почему пересчитался); app.config.performance = true (метрики в Performance timeline).</p><p>Подходы: «почему перерисовался?» → onRenderTriggered; «почему computed пересчитался?» → onTrigger; «лишние ре-рендеры детей» → проверить создание новых объектов/функций в родителе (новая ссылка = ре-рендер); «медленный рендер» → DevTools timeline.</p><p>Связь с оптимизацией: сначала измерить (эти хуки), потом v-memo/shallowRef/стабилизация пропсов. Не оптимизировать вслепую.</p><p>Vue 2 → 3: новые хуки Vue 3 (в Vue 2 не было гранулярной отладки реактивности рендера); появились благодаря Proxy-реактивности с явными track/trigger.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Vue: Шаблоны и директивы
+  {
+    id: 'q_vue_templates_001',
+    topicId: 'topic_vue_templates',
+    question: 'Как компилируются шаблоны Vue и что такое директивы?',
+    answer:
+      '<p>Шаблоны Vue - декларативный синтаксис, описывающий, как должен выглядеть DOM от состояния. Ключевое: шаблон не строка, интерпретируемая в рантайме, а код, компилируемый в render-функцию.</p><p>Компиляция: компилятор Vue превращает шаблон в render-функцию (возвращающую Virtual DOM/VNode) на этапе сборки (SFC) или в рантайме (runtime-компилятор). &lt;div :class="cls"&gt;{{ msg }}&lt;/div&gt; компилируется в h("div", { class: cls }, msg). Шаблон - сахар над render-функциями, но компилятор его оптимизирует (patch flags, hoisting).</p><p>Интерполяция: {{ expression }} - JS-выражение (не стейтмент): {{ count + 1 }}, {{ ok ? "yes" : "no" }}. Нельзя if, циклы. Выполняется в области компонента.</p><p>Директивы - атрибуты с префиксом v-, применяющие реактивное поведение: v-bind (:), v-on (@), v-if/v-else-if/v-else, v-show, v-for, v-model, v-slot (#), v-html (осторожно XSS), v-text, v-once, v-memo, v-pre, v-cloak.</p><p>Анатомия: v-on:click.prevent="handler" - имя (v-on), аргумент (click, после :), модификатор (.prevent), значение (выражение). Аргумент динамический: v-bind:[attrName], v-on:[eventName].</p><p>Сокращения: v-bind:href → :href; :href без значения (3.4+) = :href="href" (same-name); v-on:click → @click; v-slot:name → #name.</p><p>Нюансы: шаблон компилируется (оптимизации, типизация с Volar); выражения ограничены (single expression, состояние + белый список Math/Date); директива реактивна, обычный атрибут статичен.</p><p>Vue 2 → 3: синтаксис сохранился; изменения - v-model (modelValue), приоритет v-if/v-for, same-name shorthand (3.4+), оптимизированный компилятор (patch flags).</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_002',
+    topicId: 'topic_vue_templates',
+    question: 'В чём разница между v-if и v-show?',
+    answer:
+      '<p>Обе управляют видимостью, но по-разному: v-if добавляет/удаляет из DOM, v-show переключает CSS.</p><p>v-if - условный рендеринг: при false элемент вообще не рендерится (нет в DOM), при true создаётся. При переключении элемент (и дочерние компоненты, директивы) уничтожается и пересоздаётся - компоненты проходят полный жизненный цикл (mount/unmount). Ленивый: если начальное условие false, контент не рендерится, пока не станет true.</p><p>v-show - переключение через CSS: элемент всегда рендерится и остаётся в DOM, меняется только display (display: none при false). При переключении элемент не создаётся/не уничтожается, компоненты сохраняют состояние. Не ленивый: рендерится всегда, даже скрытым.</p><p>Различия: в DOM при false (v-if отсутствует / v-show присутствует с display:none); переключение (уничтожение-создание / смена display); стоимость переключения (высокая / низкая); начальный рендер если false (нулевая / есть); жизненный цикл при toggle (mount-unmount / сохраняется); ленивость (да / нет).</p><p>Когда: v-if - условие редко меняется, тяжёлый изначально ненужный контент (ленивость), нужно пересоздание (сброс состояния), v-if/v-else; v-show - частое переключение (тоглы, табы, ховеры), накладные на create/destroy неоправданны.</p><p>Правило: частое переключение → v-show; редкое/тяжёлый ленивый → v-if.</p><p>Нюансы: v-if на &lt;template&gt; (группа без обёртки), v-show на template НЕ работает (нечему ставить display); v-if + v-else/v-else-if цепочки; key управляет переиспользованием при переключении; оба триггерят Transition; много скрытых v-show раздувают DOM (v-if бы не создал).</p><p>Vue 2 → 3: поведение одинаково; отличие - приоритет v-if относительно v-for изменился.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_003',
+    topicId: 'topic_vue_templates',
+    question: 'Как работает v-for и почему важен key?',
+    answer:
+      '<p>v-for рендерит список из массива/объекта. key и подводные камни - частый источник багов.</p><p>Синтаксис: массив (item, index) in items; объект (value, key, index) in object; число n in 10; итерируемое (Map, Set).</p><p>Почему нужен key: уникальный идентификатор каждого элемента, по которому Vue отслеживает соответствие VNode при обновлении. С key Vue понимает, какой элемент какому соответствует - переиспользует DOM правильно, вставляет/удаляет/перемещает точечно. Без key (или с индексом) - стратегия «обновления на месте» (переиспользует по позиции, обновляя содержимое) - работает для простых списков, ломается при перестановке/вставке/удалении.</p><p>Проблема индекса как key: при вставке/удалении/сортировке индексы сдвигаются, Vue сопоставляет неправильно (элемент с индексом 0 всегда «тот же», хотя данные поменялись). Баги: input сохраняют старые значения, чекбоксы прыгают, анимации ломаются, компоненты не пересоздаются. Правильно - стабильный id из данных (item.id), не индекс. Индекс допустим для статичного списка без состояния.</p><p>Реактивность (Vue 2 → 3): Vue 2 - arr[0] = x и arr.length не реактивны (Vue.set/splice); Vue 3 (Proxy) - все мутации реактивны. Методы-мутаторы (push, splice, sort) реактивны в обоих; filter/map - присвоить результат.</p><p>Нюансы: key уникален в списке и стабилен (не Math.random(), не индекс); v-for на &lt;template&gt; (группа без обёртки); key на template (Vue 3), не на внутренних; правильные ключи = минимум манипуляций DOM + сохранённое состояние; огромные списки - виртуализация, v-memo.</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_004',
+    topicId: 'topic_vue_templates',
+    question: 'Какой приоритет у v-if и v-for и почему их не стоит совмещать?',
+    answer:
+      '<p>Совмещение v-if и v-for на одном элементе - ошибка с поведением, изменившимся между Vue 2 и Vue 3.</p><p>Приоритет (менялся!): Vue 2 - v-for выше v-if (v-if выполнялся внутри каждой итерации); Vue 3 - v-if выше v-for (v-if выполняется раньше). Обратное поведение - подвох при миграции.</p><p>Почему в Vue 3 проблема: &lt;li v-for="user in users" v-if="user.active"&gt; - v-if вычисляется раньше v-for, обращается к user, которого ещё нет (итерация не началась). Ошибка (user is not defined). В Vue 2 «работало» (v-for первее), но неэффективно.</p><p>Почему не совмещать: неоднозначность приоритета (зависит от версии); неэффективность (в Vue 2-логике v-if фильтрует внутри v-for - весь список итерируется, отфильтрованные всё равно обходятся); в Vue 3 просто ломается.</p><p>Решения:</p><ol><li>Фильтрация через computed (лучшее): const activeUsers = computed(() =&gt; users.value.filter(u =&gt; u.active)); v-for="user in activeUsers". До рендеринга, только нужные, кэшируется, читаемо</li><li>v-if на template-обёртке (условие на весь список): &lt;template v-if="shouldShowList"&gt;&lt;li v-for=...&gt;</li><li>v-if на внутреннем template (условие на элемент): &lt;template v-for="user in users"&gt;&lt;li v-if="user.active"&gt; - разделены, приоритет не конфликтует</li></ol><p>Вывод: никогда не ставить v-if и v-for на один элемент. Фильтрация - computed; условие на список - v-if на обёртке. Правильнее, эффективнее, не зависит от версии.</p><p>Vue 2 → 3: приоритет инвертирован (Vue 2 v-for &gt; v-if; Vue 3 v-if &gt; v-for); в Vue 3 совмещение с обращением к переменной итерации ломается.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_005',
+    topicId: 'topic_vue_templates',
+    question: 'Как работают модификаторы событий, клавиш и v-model?',
+    answer:
+      '<p>Модификаторы - постфиксы директив (после .), меняющие поведение декларативно, избавляя от шаблонного кода.</p><p>Модификаторы событий (@): .prevent (event.preventDefault() - отменить submit); .stop (stopPropagation - остановить всплытие); .self (только если событие от самого элемента, не потомков); .once (один раз); .capture (фаза capture, не bubbling); .passive (не блокирует скролл, оптимизация). Комбинируются: @click.stop.prevent. Делают в разметке то, что писалось бы в обработчике.</p><p>Модификаторы клавиш: реагировать на конкретную (@keyup.enter, .esc, .tab, .delete, .space, стрелки); системные (.ctrl, .alt, .shift, .meta - при зажатой); .exact (только точный набор модификаторов, @click.ctrl.exact - только Ctrl); кнопки мыши (.left, .right, .middle).</p><p>Модификаторы v-model: .trim (обрезать пробелы); .number (привести к числу); .lazy (синхронизация по change, не input - меньше обновлений); кастомные для компонентных v-model через defineModel (деструктуризация модификаторов, обработка в get/set).</p><p>Под капотом: модификаторы событий компилируются в код обработчика (.prevent → event.preventDefault()); v-model меняют слушаемое событие (.lazy → change) и трансформацию (.trim/.number). Compile-time трансформация.</p><p>Нюансы: .passive и .prevent несовместимы (passive не отменяет); порядок иногда важен (@click.prevent.self vs .self.prevent); .exact для точных сочетаний; кастомные v-model модификаторы для переиспользуемых input.</p><p>Vue 2 → 3: keyCode-модификаторы (числовые) удалены (использовать имена); .native удалён (fallthrough иначе - слушатели на компоненте идут на корень); кастомные v-model модификаторы добавлены.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_006',
+    topicId: 'topic_vue_templates',
+    question: 'Как работают привязки class и style?',
+    answer:
+      '<p>Привязка class/style - удобный синтаксис с объектами и массивами.</p><p>Class - объектный синтаксис: :class="{ active: isActive, \'text-danger\': hasError }" - ключ имя класса, значение булево (включить если truthy). Можно в computed.</p><p>Class - массивный: :class="[activeClass, errorClass]"; :class="[isActive ? \'active\' : \'\', \'base\']"; :class="[{ active: isActive }, \'base\']" (с объектом внутри).</p><p>Комбинирование: class="static" :class="{ active: isActive }" - статический и :class объединяются (не перезаписывают), результат class="static active".</p><p>Style - объектный: :style="{ color: activeColor, fontSize: size + \'px\' }" - ключ CSS-свойство (camelCase fontSize или kebab в кавычках), значение выражение. Массивный: :style="[baseStyles, overrideStyles]" (объединить объекты).</p><p>Автовозможности: автопрефиксы (вендорные для нужных свойств); множественные значения :style="{ display: [\'-webkit-box\', \'flex\'] }" - применит последнее поддерживаемое.</p><p>На компоненте (fallthrough): &lt;MyComponent class="extra" /&gt; - class/style не теряются, мержатся с корневым элементом (Vue 3 объединяет). При нескольких корнях - явно (:class="$attrs.class" или v-bind="$attrs").</p><p>Нюансы: реактивность (изменения авто); camelCase vs kebab в style; CSS-переменные :style="{ \'--main-color\': color }" (для тем); инлайн-стили перебивают классы по специфичности; сложные вычисления в computed; v-bind в &lt;style&gt; - альтернатива для динамики через CSS-переменные.</p><p>Vue 2 → 3: синтаксис идентичен; в Vue 3 class/style входят в $attrs, при нескольких корнях нужно явное распределение.</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_007',
+    topicId: 'topic_vue_templates',
+    question: 'Что такое v-once и v-memo и когда их использовать?',
+    answer:
+      '<p>v-once и v-memo - директивы оптимизации рендеринга, пропускающие обновление статичных/редких частей. Микрооптимизации.</p><p>v-once - рендер один раз: элемент и поддерево рендерятся при первом рендере, дальше Vue пропускает их при обновлениях (статика). Даже если значение изменится - DOM не обновится (заморожено). Когда: контент, который никогда не изменится (статичные заголовки, конфиг, разметка от начального состояния). Экономит diff навсегда.</p><p>v-memo (3.2+) - условная мемоизация: v-memo="[valueA, valueB]" - поддерево обновляется только если значение в массиве изменилось; иначе весь поддерево пропускается (переиспользуются прошлые VNode, diff не выполняется). v-once = никогда, v-memo = только при изменении зависимостей. v-memo="[]" ≈ v-once.</p><p>Главный кейс - большие списки: &lt;div v-for="item in list" :key="item.id" v-memo="[item.id === selected]"&gt;. Большой список (&gt;1000), меняется selected. Без v-memo смена selected пересоздаёт VNode всех элементов, хотя изменились два. v-memo обновляет элемент только если его выбранность изменилась; невыбранные переиспользуют VNode и пропускают diff. item.id не включать - Vue выводит из :key.</p><p>Когда НЕ надо: v-memo только для микрооптимизаций в критичных сценариях (большие v-for &gt;1000), редко нужен; не вместо computed (computed для вычислений, v-memo для пропуска рендеринга); опасность неверных зависимостей (неполный массив → пропуск нужных обновлений, баг).</p><p>Нюансы: v-once - абсолютная статика; v-memo - условный пропуск; оба преждевременная оптимизация в 99% (сначала измерить); компилятор Vue 3 уже оптимизирует (patch flags, hoisting).</p><p>Vue 2 → 3: v-once был; v-memo - новая директива Vue 3.2+ для больших списков.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_008',
+    topicId: 'topic_vue_templates',
+    question: 'Как создавать кастомные директивы?',
+    answer:
+      '<p>Кастомные директивы переиспользуют низкоуровневую работу с DOM через объект с хуками, получающими DOM-элемент.</p><p>Пример: const vFocus = { mounted: (el) =&gt; el.focus() }; &lt;input v-focus /&gt;. В script setup camelCase-переменная с префиксом v (vFocus) доступна как v-focus.</p><p>Хуки (Vue 3): created (до применения атрибутов), beforeMount (перед вставкой), mounted (смонтирован), beforeUpdate, updated (после обновления), beforeUnmount, unmounted. Зеркалят жизненный цикл компонента. Все опциональны; часто нужны mounted и updated.</p><p>Объект binding: value (значение); oldValue (в beforeUpdate/updated); arg (аргумент из v-dir:foo); modifiers (из v-dir.bar - { bar: true }); instance (компонент). el - сам элемент (единственное изменяемое, остальное read-only). Аргументы динамические: v-dir:[arg].</p><p>Сокращённая форма: app.directive("color", (el, binding) =&gt; el.style.color = binding.value) - функция вызывается на mounted И updated.</p><p>Регистрация: локально (в script setup vName или directives: {}); глобально app.directive("name", definition).</p><p>Когда использовать: прямая манипуляция DOM на многих элементах (v-focus, v-click-outside, v-lazy, тултипы, drag-and-drop). НЕ использовать, если решается компонентом (разметка+логика) или composable (логика). Документация: только когда функциональность достижима лишь через DOM-манипуляцию; декларативные шаблоны предпочтительнее (эффективнее, SSR-friendly).</p><p>Нюансы: el единственное изменяемое (данные между хуками через el.dataset); SSR - mounted не выполняется (нет DOM); на компонентах - к корневому элементу.</p><p>Vue 2 → 3: хуки переименованы под жизненный цикл - bind → beforeMount, inserted → mounted, update/componentUpdated → beforeUpdate/updated, unbind → unmounted, добавлен created. Старые имена в Vue 3 не работают.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_009',
+    topicId: 'topic_vue_templates',
+    question: 'Что такое render-функции и h()?',
+    answer:
+      '<p>Render-функции - программный способ описать вывод компонента на JS вместо шаблона, создавая Virtual DOM через h(). Для случаев, где шаблон недостаточно гибок.</p><p>Render-функция: setup возвращает функцию, возвращающую VNode: return () =&gt; h("div", { class: "container" }, [h("h1", "Заголовок"), h("p", "Текст")]). Это то, во что компилируется шаблон под капотом (низкий уровень, шаблон - сахар).</p><p>h(type, props, children): type - тег-строка ("div"), компонент, встроенный (Teleport); props - объект атрибутов/пропсов/слушателей ({ class, onClick: handler, id }); children - строка (текст), массив VNode, или объект слотов. Слушатели через on + PascalCase (onClick, onMouseenter). Слоты - функции в объекте children.</p><p>Когда нужны: программная гибкость (динамическое построение структуры по данным, рекурсивные структуры, сложные условия); динамический выбор тега/компонента; библиотеки компонентов; renderless-компоненты; HOC (оборачивание VNode); манипуляция VNode (клонировать, фильтровать слоты).</p><p>Плюс: максимальная гибкость (вся мощь JS). Минус: многословнее и менее читаемо; теряются оптимизации компилятора (patch flags, static hoisting) - дифает шире. Для обычных компонентов шаблон предпочтительнее (читаемее, оптимизированнее).</p><p>Нюансы: render-функция это render effect (читаемые реактивные значения отслеживаются); слоты через useSlots(), вызываются как функции (slots.default?.()); VNode одноразовый (для повтора h() заново); потеря оптимизаций - трейд-офф.</p><p>Vue 2 → 3: Vue 2 render(h) получал h аргументом, раздельные attrs/props/on; Vue 3 h импортируется из vue, плоская структура props ({ class, onClick, id }), слушатели onXxx.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_010',
+    topicId: 'topic_vue_templates',
+    question: 'Что такое JSX во Vue и когда его использовать?',
+    answer:
+      '<p>JSX - синтаксическое расширение JS для разметки в коде, альтернатива шаблонам и сахар над render-функциями.</p><p>JSX во Vue: return () =&gt; (&lt;div class="container"&gt;&lt;h1&gt;Счётчик: {count.value}&lt;/h1&gt;&lt;button onClick={() =&gt; count.value++}&gt;+1&lt;/button&gt;&lt;/div&gt;). Сахар над h() - компилируется в render-функцию. Требует настройки (@vue/babel-plugin-jsx или Vite-плагин).</p><p>JSX vs шаблоны: нет большинства директив (v-if, v-for) - вместо них обычный JS: v-for → .map() ({items.value.map(item =&gt; &lt;li key={item.id}&gt;{item.name}&lt;/li&gt;)}), v-if → тернарник/&& ({show.value &amp;&amp; &lt;div&gt;}). v-model/v-show частично (через плагин). Слушатели onClick, не @click. Пропсы как атрибуты.</p><p>Когда использовать: сложная программная логика рендеринга (мощь JS с читаемостью выше голого h()); динамическое построение, где директивы неудобны; библиотеки с сложной render-логикой; React-фон; когда render-функция многословна, а шаблон негибок (золотая середина).</p><p>Что предпочесть: шаблон (по умолчанию) - декларативен, читаем, лучше оптимизируется компилятором (patch flags, hoisting); JSX - для программной гибкости, но теряет часть compile-time оптимизаций (трейд-офф). Спектр: шаблон (оптимально) → JSX (гибко, читаемо) → h() (максимально гибко, многословно).</p><p>Нюансы: потеря оптимизаций (для критичных компонентов шаблон быстрее); .value в JSX писать явно (в шаблоне ref разворачивается); хорошая типизация с TS; можно смешивать точечно.</p><p>Vue 2 → 3: поддерживался в Vue 2; Vue 3 - обновлённый плагин, плоская структура props, больше фич. Концепция та же.</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_011',
+    topicId: 'topic_vue_templates',
+    question: 'Как работают v-html, v-text, v-pre, v-cloak и другие директивы?',
+    answer:
+      '<p>Обзор оставшихся встроенных директив, особенно v-html из-за безопасности.</p><p>v-html - вставка сырого HTML (осторожно XSS): устанавливает innerHTML - вставляет строку как реальный HTML (парсится), не текст. КРИТИЧНАЯ ОПАСНОСТЬ XSS: если в rawHtml попадёт пользовательский ввод с script или обработчиками - выполнится. Никогда с недоверенным контентом; только доверенный HTML (своя CMS с санитизацией). Санитизировать (DOMPurify) при малейшей ненадёжности. Не работает со scoped-стилями (вставленный HTML без data-атрибута).</p><p>v-text - текстовое содержимое: устанавливает textContent (безопасно, HTML экранируется). Эквивалент {{ msg }}, но директивой; {{ }} предпочтительнее (читаемее).</p><p>v-pre - пропустить компиляцию: Vue не компилирует элемент и содержимое, выводит как есть (включая {{ }} без интерполяции). Когда: показать литеральные mustache (документация по Vue), оптимизация больших статичных блоков.</p><p>v-cloak - скрыть до готовности: остаётся, пока компонент не смонтирован, затем удаляется. Когда: no-build setup (CDN без сборки) - предотвращает мелькание некомпилированного шаблона (сырые {{ }}); с CSS [v-cloak] { display: none }. В SFC со сборкой не нужен.</p><p>Другие (разбирались): v-bind (:), v-on (@), v-model, v-if/v-show, v-for, v-slot (#), v-once/v-memo.</p><p>Нюансы: v-html - главный риск безопасности (всегда думать об XSS, предпочитать {{ }}/v-text - они экранируют); v-text vs {{ }} эквивалентны ({{ }} читаемее, комбинируется с текстом); v-cloak редко в современных сборках; v-pre нишевый.</p><p>Vue 2 → 3: работают одинаково, без существенных изменений; XSS-риск v-html актуален в обеих.</p>',
+    order: 11,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_templates_012',
+    topicId: 'topic_vue_templates',
+    question: 'Как работает v-bind детально (динамические аргументы, объекты, модификаторы)?',
+    answer:
+      '<p>Глубокий разбор v-bind - самой используемой директивы.</p><p>Базовая привязка: :src="imageSrc", :href="url", :id="dynamicId" - привязывает атрибут/проп к реактивному выражению, при изменении обновляется.</p><p>Same-name shorthand (3.4+): :id (без значения) = :id="id" когда имена совпадают (как в JSX).</p><p>Динамические аргументы: :[attributeName]="value" - имя атрибута из переменной; @[eventName]="handler" - имя события. Позволяет динамически выбирать, какой атрибут/событие привязать. Ограничения: строка (или null для удаления), без пробелов/кавычек.</p><p>Привязка объекта: v-bind="objectOfAttrs" без аргумента - привязывает все свойства объекта как отдельные атрибуты. Полезно для проброса группы (v-bind="$attrs" для fallthrough).</p><p>Модификаторы: .prop - как DOM-свойство (property), не атрибут (:someProp.prop, разница property/attribute); .attr - принудительно атрибут; .camel - kebab в camelCase (:view-box.camel → viewBox, для SVG).</p><p>Нюансы: null/undefined значение удаляет атрибут (условные атрибуты, не attr="null"); Boolean-атрибуты (:disabled="false" убирает, "true" добавляет - HTML-семантика); .prop для DOM-свойства (innerHTML, value); порядок мержа при v-bind="obj" + отдельные атрибуты (позже перезаписывает); v-bind="$attrs" - паттерн обёрток.</p><p>Vue 2 → 3: динамические аргументы :[name] (2.6+/3); .sync удалён (заменён v-model:arg); same-name shorthand :id (3.4+); v-bind="$attrs" включает class/style/слушатели (Vue 3 объединил).</p>',
+    order: 12,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Vue: Virtual DOM и рендеринг
+  {
+    id: 'q_vue_rendering_001',
+    topicId: 'topic_vue_rendering',
+    question: 'Что такое Virtual DOM и зачем он нужен?',
+    answer:
+      '<p>Virtual DOM (VDOM) - лёгкое представление реального DOM в виде JS-объектов, с которым фреймворк работает в памяти для эффективного вычисления изменений.</p><p>Что это: дерево обычных JS-объектов (VNode) - { type: "div", props: { id, class }, children: [...] }. Описание того, как должен выглядеть DOM, а не сам DOM. Легковесная копия в памяти.</p><p>Проблема: прямые манипуляции реальным DOM дорогие (reflow/repaint); обновлять вручную на каждое изменение - медленно. Императивный подход (jQuery) не масштабируется, рассинхронизирует UI и состояние.</p><p>Как решает: разработчик пишет декларативно («при таком состоянии UI такой»), не трогает DOM. Фреймворк строит VDOM из состояния; при изменении строит новое дерево; сравнивает (diff/patch/reconciliation) старое и новое, вычисляет минимальный набор изменений и применяет только их. Разработчик думает о состоянии, фреймворк минимизирует манипуляции DOM.</p><p>Цикл рендеринга: Compile (шаблоны → render-функции, возвращающие VDOM; на сборке или в рантайме); Mount (рендерер обходит VDOM и создаёт реальные DOM-узлы); Patch (при изменении зависимости новое VDOM-дерево сравнивается со старым, применяются изменения к DOM).</p><p>Критика VDOM: классический (React) чисто рантаймовый - алгоритм не может делать предположений, полностью обходит дерево и дифает каждый узел; даже для неизменяемых частей создаёт новые VNode (нагрузка на память). Vue решает компилятором (Compiler-Informed VDOM) - анализ шаблона и подсказки рантайму.</p><p>Vue 2 → 3: VDOM в обеих; Vue 3 переписал рантайм и компилятор с оптимизациями (patch flags, static hoisting, block tree). Vue 3.6 (2026) - Vapor Mode без VDOM (прямые DOM-операции), опциональный.</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_002',
+    topicId: 'topic_vue_rendering',
+    question: 'Как работает diff-алгоритм (reconciliation) во Vue?',
+    answer:
+      '<p>Diff (reconciliation, patch) - сравнение старого и нового VDOM-деревьев для вычисления минимальных изменений DOM.</p><p>Что это: при изменении состояния Vue создаёт новое VDOM-дерево; diff обходит и сравнивает его со старым, находит различия, применяет к DOM.</p><p>Принципы сравнения:</p><ol><li>По уровням (level-by-level): сравнивает узлы на одном уровне, не между уровнями. Эвристика, снижающая сложность с O(n³) до O(n)</li><li>По типу узла: одинаковый тип (div → div) - переиспользует DOM-элемент, обновляет только изменившееся (patch на месте); разный (div → span) - уничтожает старый, создаёт новый</li><li>Обновление атрибутов/содержимого: для того же типа - только различия</li></ol><p>Diff списков (важнейшее): с key - сопоставляет узлы по ключу, не позиции - понять оставшиеся (переиспользовать DOM), добавленные (создать), удалённые (убрать), перемещённые (передвинуть, не пересоздать). Ищет самую длинную стабильную подпоследовательность (LIS-подобно) для минимума перемещений. Без key - по позиции (in-place), ломается при вставке/перестановке.</p><p>Compiler-Informed diff (отличие Vue): чистый VDOM (React) полностью обходит дерево и сравнивает все пропсы (не знает, что статично). Vue благодаря компилятору знает заранее динамические узлы и свойства (patch flags, block tree) - не обходит статику, сравнивает только помеченные динамические пропсы. Diff направляется подсказками компилятора, а не слепой обход.</p><p>Нюансы: эвристики O(n) - компромисс (не абсолютный минимум); key критичен для списков; правильный diff сохраняет состояние (фокус, input); patch flags выводят эффективность на новый уровень.</p><p>Vue 2 → 3: базовый алгоритм похож (level-by-level, ключи, LIS); Vue 3 - compiler-informed (patch flags, block tree сокращают обход, Vue 2 обходил полнее).</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_003',
+    topicId: 'topic_vue_rendering',
+    question: 'Что такое patch flags и как они ускоряют обновления?',
+    answer:
+      '<p>Patch flags - аннотации в VNode, которые компилятор Vue 3 добавляет, чтобы сообщить рантайму, какие части узла динамические. Одна из главных оптимизаций Vue 3.</p><p>Проблема: в чистом VDOM при обновлении узла рантайм сравнивает ВСЕ пропсы (class, id, style, атрибуты), чтобы понять изменения. Но чаще динамична только часть (текст или class) - сравнивать всё лишняя работа.</p><p>Что это: компилятор статически анализирует шаблон и для каждого элемента с динамическими привязками генерирует числовой флаг типа обновлений. &lt;div :id="id" class="static"&gt;{{ text }}&lt;/div&gt; → createElementVNode с флагом (последний аргумент) - битовая маска типов динамики.</p><p>Типы флагов: 1 (TEXT - текст), 2 (CLASS), 4 (STYLE), 8 (PROPS - конкретные пропсы с массивом ключей), 16 (FULL_PROPS - динамические ключи), 64 (STABLE_FRAGMENT). Комбинируются битовым ИЛИ (TEXT | CLASS).</p><p>Как ускоряет: рантайм смотрит на patch flag и обновляет только помеченное - TEXT → только текст (пропустить атрибуты); CLASS → только class; PROPS с массивом ключей → только эти пропсы. Статические атрибуты вообще не проверяются. Вместо «сравнить все пропсы каждого узла» → «обновить помеченное».</p><p>Пример: &lt;div class="static" :id="dynamicId"&gt;{{ message }}&lt;/div&gt; - флаг говорит «динамичны только id и текст», class="static" пропускается.</p><p>Нюансы: compile-time генерация (render-функции/JSX не получают - менее оптимальны); динамические пропсы перечисляются массивом для точечной проверки; работает с block tree (флаги помечают, block tree собирает в плоский список); часть Compiler-Informed VDOM.</p><p>Vue 2 → 3: новая оптимизация Vue 3 (Vue 2 компилятор был прост, мог пропускать статические поддеревья, но не помечал типы динамики на уровне пропсов).</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_004',
+    topicId: 'topic_vue_rendering',
+    question: 'Что такое static hoisting (подъём статики)?',
+    answer:
+      '<p>Static hoisting - оптимизация компилятора Vue 3, извлекающая создание статических VNode за пределы render-функции, чтобы они создавались один раз и переиспользовались при ре-рендерах.</p><p>Проблема: в шаблоне есть части без динамических привязок (статичные элементы). В обычной render-функции VNode для статических элементов создавались бы заново на каждый ре-рендер, хотя не меняются - лишнее создание объектов, нагрузка на память/GC.</p><p>Как работает: компилятор обнаруживает статические узлы и поднимает их создание за пределы render-функции в константы уровня модуля (const _hoisted_1 = createElementVNode(...)). Статические VNode создаются один раз (при загрузке модуля) и переиспользуются - render-функция ссылается на готовые константы, при ре-рендере создаётся только динамическое.</p><p>Что даёт: меньше создания объектов (статика не пересоздаётся); меньше нагрузка на память и GC (меньше мусора); diff пропускает поднятые узлы (те же ссылки).</p><p>Уровни: отдельные статические элементы (константы); статические поддеревья (целиком); статические объекты пропсов ({ class: "x" } не пересоздаётся); при большом объёме статики - static content stringification (большой блок в одну HTML-строку через innerHTML, ещё эффективнее).</p><p>Нюансы: compile-time (только шаблоны, render-функции/JSX не получают автоматически); узел статичен без динамических привязок (:, {{ }}, директив) у него и детей; синергия с patch flags/block tree (hoisting убирает статику из создания, они - из diff).</p><p>Vue 2 → 3: Vue 2 делал частично (пропускал статические поддеревья при diff, но не поднимал создание агрессивно - простой компилятор); Vue 3 переписал компилятор с AST-transform pipeline для агрессивного hoisting. Ключевое улучшение памяти/производительности.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_005',
+    topicId: 'topic_vue_rendering',
+    question: 'Что такое block tree и tree flattening?',
+    answer:
+      '<p>Block tree и tree flattening - оптимизация Vue 3, сводящая обход при diff к плоскому списку только динамических узлов, вместо рекурсивного обхода всего дерева. Самая мощная compiler-informed оптимизация.</p><p>Проблема: даже с patch flags рантайму пришлось бы рекурсивно обойти всё дерево, чтобы найти узлы с флагами. Для шаблона с большой статикой и редкой динамикой - расточительно.</p><p>Block: узел, отслеживающий все свои динамические потомки (не только прямых детей, а на любой глубине) в плоском массиве. Корень шаблона - block; v-if/v-for создают вложенные blocks.</p><p>Tree flattening: компилятор собирает все динамические узлы (с patch flags) в плоский массив независимо от вложенности. &lt;div&gt; (root block) с вложенными статическими (не отслеживаются) и динамическими (:id, {{ bar }} - отслеживаются) → плоский массив: block root → div с :id → div с {{ bar }}. При ре-рендере Vue обходит только плоский массив, не всё дерево; статика пропускается.</p><p>Эффект: обход сводится с «рекурсивно всё дерево» до «плоский список из N динамических узлов»; сокращает обходимые узлы на порядок (order of magnitude); обходит накладные расходы VDOM.</p><p>Blocks и структурные директивы: v-if/v-for меняют структуру (плоский массив стал бы нестабильным). Решение: v-if/v-for создают новые block-узлы, отслеживаемые в массиве родительского блока; внутри дочернего блока структура снова стабильна. Дерево делится на вложенные блоки, внутри каждого структура стабильна → динамика плоским массивом.</p><p>Нюансы: стабильность структуры внутри блока - ключ; синергия (hoisting убирает статику из создания, patch flags помечают тип, block tree - из обхода); compile-time (шаблоны).</p><p>Vue 2 → 3: новая оптимизация Vue 3 (Vue 2 обходил дерево полностью); главная причина ускорения обновлений.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_006',
+    topicId: 'topic_vue_rendering',
+    question: 'Что такое Compiler-Informed Virtual DOM и почему Vue быстрее чистого VDOM?',
+    answer:
+      '<p>Как compiler-оптимизации складываются в подход Compiler-Informed Virtual DOM, делающий Vue эффективнее чисто-рантаймовых VDOM (React).</p><p>Проблема чистого VDOM: согласование рантаймовое, алгоритм не может делать предположений - полностью обходит дерево и дифает пропсы каждого узла; даже для неизменяемых частей создаёт новые VNode (нагрузка на память). Грубоватое согласование жертвует эффективностью ради декларативности.</p><p>Идея: Vue контролирует и компилятор, и рантайм - реализует compile-time оптимизации, доступные только связанным компилятору+рантайму. Компилятор статически анализирует шаблон и оставляет подсказки в коде, чтобы рантайм срезал углы. Рантайм не слепой - знает, что статично, что динамично, какого типа.</p><p>Три оптимизации вместе: static hoisting (статика создаётся раз, переиспользуется - меньше аллокаций/GC); patch flags (тип динамики - рантайм проверяет только помеченное); block tree/tree flattening (динамика в плоском массиве - обход только динамики). Статика исключается из создания (hoisting), обхода (block tree), сравнения пропсов (patch flags).</p><p>Почему быстрее: чистый VDOM - работа пропорциональна размеру всего дерева (обойти всё + сравнить все пропсы + создать VNode заново); Vue - работа пропорциональна количеству динамики (плоский список + помеченные пропсы + переиспользование статики). Для типичного UI (много статики) радикально меньше работы.</p><p>Гибридность: Vue сохраняет render-функции для контроля (edge cases, библиотеки); оптимизации для шаблонов (статический анализ), render-функции/JSX как обычный VDOM. Шаблоны рекомендуются (декларативны и оптимальны).</p><p>Trade-off: нужен статический анализ шаблона - отсюда детерминированность синтаксиса (ограничить выразительность ради оптимизации).</p><p>Vue 2 → 3: Vue 2 частичные оптимизации; Vue 3 - полноценный Compiler-Informed VDOM. Vue 3.6 Vapor Mode - прямые DOM-операции без VDOM (вдохновлено SolidJS/Svelte).</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_007',
+    topicId: 'topic_vue_rendering',
+    question: 'Как реактивность связана с рендерингом (render effect и scheduler)?',
+    answer:
+      '<p>Механика со стороны рендеринга: как render effect, планировщик и очередь связывают изменение данных с перерисовкой.</p><p>Render effect: функция рендеринга (строит VDOM) оборачивается в реактивный эффект (внутренний watchEffect). При первом рендере строит VDOM, прочитанные реактивные значения отслеживаются (track) как зависимости. При изменении зависимости (trigger) render effect помечается на перезапуск → перерисовка (новое VDOM → diff → patch). Связывает track/trigger с рендерингом.</p><p>Точечность: перерисовывается только компонент, чей render effect зависит от изменившихся данных; не читает изменившееся - не перерисуется. В отличие от React (ре-рендер всего поддерева, ручная мемоизация), Vue отслеживает зависимости автоматически на уровне доступа - точечно.</p><p>Scheduler и очередь: Vue не перерисовывает синхронно - render effect ставится в очередь планировщика. Батчинг: множественные изменения в тике → одна перерисовка (count.value++ трижды = один ре-рендер). Дедупликация (компонент не дважды за тик). Очередь сбрасывается асинхронно в микрозадаче (Promise). DOM обновляется в конце синхронного кода.</p><p>Порядок flush: pre-watchers (до ре-рендера) → render effect (перерисовка) → post-watchers (после DOM). Родитель до потомка. Объясняет flush-тайминги (pre видит старый DOM, post обновлённый).</p><p>nextTick: резолвится после сброса очереди (применения DOM) - для работы с обновлённым DOM.</p><p>Полная картина: реактивность (track/trigger) - что и когда; render effect - связь данных с перерисовкой; scheduler - эффективное применение (батчинг, дедупликация, микрозадача); VDOM diff + patch flags/block tree - дешёвая перерисовка; nextTick - дождаться завершения.</p><p>Vue 2 → 3: механика схожа; Vue 3 - Proxy-реактивность и переписанный scheduler.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_008',
+    topicId: 'topic_vue_rendering',
+    question: 'Что такое VNode и как устроена render-функция изнутри?',
+    answer:
+      '<p>VNode (виртуальный узел) - базовая единица Virtual DOM, и как render-функция строит из них дерево.</p><p>VNode - обычный JS-объект, описывающий один узел UI (элемент, компонент, текст, комментарий, фрагмент). Виртуальное описание, из которого рендерер создаёт реальный DOM. Структура: { type: "div", props: { id, onClick }, children: [...], key, patchFlag, el }.</p><p>Ключевые поля: type (строка-тег, объект компонента, спец Text/Comment/Fragment/Teleport/Suspense); props (атрибуты, пропсы, слушатели onClick, class, style, key, ref); children (массив VNode, строка-текст, объект слотов); key (для diff списков); patchFlag/dynamicProps (подсказки оптимизации Vue 3); el (ссылка на реальный DOM после монтирования).</p><p>Как render-функция создаёт дерево: вызывает h() (hyperscript), создающий VNode - h("div", { class }, [h("h1", "Заголовок"), h("p", ctx.message)]). Возвращает корневой VNode; рантайм обходит дерево и создаёт DOM (mount) или дифает (patch).</p><p>Типы VNode: element (HTML-элемент); component (создаёт инстанс); text (текстовый узел); comment (для v-if в false как плейсхолдер); fragment (несколько корней без обёртки).</p><p>Нюансы: VNode одноразовый (смонтированный нельзя переиспользовать - баги, для повтора новый h()); el связывает VNode с DOM (для патча); слоты как функции (ленивое создание при рендере потомка); Vue 3 нормализует детей (строки → Text, массивы → Fragment); patchFlag/dynamicProps для compiler-informed diff.</p><p>Связь с компилятором: шаблон компилируется в render-функцию с проставленными patch flags и blocks - скомпилированные VNode умнее ручных h().</p><p>Vue 2 → 3: плоские props (Vue 2 - раздельные attrs/props/on/domProps); добавлены patchFlag/dynamicProps, фрагменты; h() импортируется из vue.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_009',
+    topicId: 'topic_vue_rendering',
+    question: 'Как оптимизировать рендеринг и избегать лишних ре-рендеров?',
+    answer:
+      '<p>Как диагностировать и устранять лишние перерисовки, используя механику рендеринга.</p><p>Лишний ре-рендер - когда компонент перерисовывается, хотя визуальный результат не изменился, или перерисовка шире необходимой.</p><p>Причины и решения:</p><ol><li>Нестабильные пропсы: родитель создаёт новый объект/массив/функцию каждый рендер (&lt;Child :config="{ a: 1 }" :onClick="() =&gt; ..." /&gt;) - потомок видит новую ссылку и перерисовывается. Решение: computed для производных, функции вне render-области, стабилизация ссылок</li><li>Слишком широкая зависимость: читает большой объект, использует одно поле - любое изменение триггерит. Решение: читать точечно; shallowRef/shallowReactive для больших структур</li><li>Неправильные ключи v-for: индекс как key - неправильное переиспользование. Решение: стабильные item.id</li></ol><p>Инструменты (после подтверждения проблемы): v-once (статика); v-memo (пропуск поддерева, большие списки &gt;1000); shallowRef/shallowReactive (поверхностная реактивность); разбиение компонентов (изоляция ре-рендеров - Vue перерисовывает точечно, мелкие компоненты = точечнее); computed (кэш производных); стабилизация ссылок (не создавать объекты/функции inline).</p><p>Диагностика: onRenderTriggered (какое изменение вызвало ре-рендер); onRenderTracked (зависимости); Vue DevTools (timeline, горячие компоненты); app.config.performance = true.</p><p>Принцип: не оптимизировать вслепую. Vue 3 уже оптимизирован (compiler-informed VDOM), большинство компонентов не нуждаются. Сначала измерить, найти реальное узкое место, потом точечно.</p><p>Vue делает автоматически: точечное отслеживание зависимостей (не перерисовывает независимое - в отличие от React с memo/useMemo/useCallback, во Vue реже нужна ручная мемоизация); compiler-optimizations (patch flags, hoisting, block tree).</p><p>Vue 2 → 3: Vue 3 эффективнее автоматически; v-memo (3.2), shallowRef - инструменты Vue 3; принцип «измерить, потом оптимизировать» одинаков.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_rendering_010',
+    topicId: 'topic_vue_rendering',
+    question: 'Что такое Vapor Mode и куда движется рендеринг Vue?',
+    answer:
+      '<p>Vapor Mode (стабилизирован в Vue 3.6, 2026) - новейшее направление рендеринга: компиляция без Virtual DOM. Свежая область, детали могут развиваться - сверяться с vuejs.org/blog.</p><p>Что это: альтернативная стратегия компиляции, компилирующая компоненты напрямую в императивные DOM-операции, полностью минуя Virtual DOM (создание VNode, diffing, reconciliation). Вдохновлено SolidJS (и Svelte): компилятор при сборке генерирует код, точечно обновляющий конкретные DOM-узлы.</p><p>Как работает: обычный режим - изменение → новое VDOM → diff → patch; Vapor - компилятор при сборке связывает каждую реактивную зависимость напрямую с DOM-узлом, при изменении хирургическое обновление нужного узла без VNode, diffing, обхода дерева. Опирается на ту же реактивность (Proxy + эффекты), но связывает эффекты напрямую с DOM.</p><p>Что даёт: меньше рантайм-кода (нет утилит VNode, diff, patch в бандле - меньший размер); меньше памяти (нет аллокации VNode); быстрее обновления (нет diffing, уровень Solid/Svelte). Выгодно: большие списки с частыми обновлениями, мобильные, статические компоненты.</p><p>Внедрение: opt-in на уровне компонента (&lt;script setup vapor&gt;), не переписывать всё; сосуществование с VDOM-компонентами (interop для UI-библиотек); тот же синтаксис/реактивность, меняется стратегия под капотом.</p><p>Контекст эволюции: продолжение Compiler-Informed VDOM - Vue улучшал VDOM (hoisting, patch flags, block tree), но пришёл к «не лучший VDOM, а его отсутствие». Философский сдвиг compiler-first: тяжёлая работа на этапе сборки, не рантайм (Svelte 2019 → Solid → Vue).</p><p>Эволюция: Vue 2 базовый VDOM → Vue 3 Compiler-Informed VDOM → Vue 3.6 Vapor Mode без VDOM. Тренд - от рантайм-diffing к compile-time прямым обновлениям.</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Vue: Vue Router
+  {
+    id: 'q_vue_router_001',
+    topicId: 'topic_vue_router',
+    question: 'Что такое Vue Router и как настраивается маршрутизация?',
+    answer:
+      '<p>Vue Router - официальная библиотека клиентской маршрутизации SPA: смена компонентов по URL без перезагрузки страницы.</p><p>Что решает: в SPA нет перезагрузки, UI управляется JS; роутер связывает URL с компонентами (при изменении адреса показывает компонент, обновляет историю) без перезагрузки. Даёт то, что в многостраничных делает сервер, но на клиенте.</p><p>Настройка: const routes = [{ path: "/", component: Home }, { path: "/about", component: About }]; createRouter({ history: createWebHistory(), routes }); app.use(router). routes - массив (path → component); createRouter создаёт инстанс; history - режим; app.use регистрирует.</p><p>Компоненты: &lt;RouterView /&gt; - слот, куда рендерится компонент текущего маршрута; &lt;RouterLink to="/about"&gt; - навигационная ссылка без перезагрузки (рендерит &lt;a&gt;, перехватывает клик, добавляет активные классы), :to="{ name: "user", params: { id: 1 } }".</p><p>Route record: path (/users/:id); component/components; name (именованная навигация); children (вложенные); meta (метаданные); redirect/alias; beforeEnter (per-route guard); props.</p><p>Именованные маршруты: { name: "user" } - router.push({ name: "user", params: { id: 1 } }), устойчивее к изменению путей.</p><p>Доступ (Composition): useRouter() (инстанс для навигации router.push()); useRoute() (текущий маршрут, реактивный - route.params, route.query).</p><p>Нюансы: SPA-навигация без перезагрузки (состояние сохраняется); интеграция с History API (назад/вперёд); ленивая загрузка роутов.</p><p>Vue 2 → 3 (Router 3 → 4): Vue 2 - new VueRouter({ mode, routes }), Vue.use; Vue 3 - createRouter({ history: createWebHistory() }), app.use, функциональный API; useRouter/useRoute (в Router 3 - this.$router/$route).</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_002',
+    topicId: 'topic_vue_router',
+    question: 'Как работают динамические маршруты и параметры?',
+    answer:
+      '<p>Динамические маршруты сопоставляют паттерны URL с переменными частями (параметрами): /users/:id для любого пользователя.</p><p>Динамический сегмент: { path: "/users/:id" } - :id сопоставится с /users/1, /users/42. Значение через route.params.id.</p><p>Доступ: const route = useRoute(); route.params.id. route.params - объект параметров, реактивен.</p><p>Множественные: /users/:userId/posts/:postId → { userId, postId }.</p><p>Query-параметры: /search?q=vue&amp;page=2 → route.query ({ q, page }). Отличие от params: query после ?, не влияет на сопоставление; params в пути.</p><p>Критичный нюанс - переиспользование компонента: при навигации /users/1 → /users/2 (тот же компонент, меняется параметр) Vue Router переиспользует экземпляр (не пересоздаёт). Следствие: setup и onMounted НЕ вызываются повторно - данные не обновятся при смене :id. Решения: watch(() =&gt; route.params.id, (newId) =&gt; fetchData(newId)); onBeforeRouteUpdate; :key на &lt;RouterView&gt; (&lt;RouterView :key="route.fullPath" /&gt; - пересоздание).</p><p>Продвинутое сопоставление: опциональный :id?; повторяемые /:chapters+ (один+), /:chapters* (ноль+); regex /:id(\\d+) (цифры); catch-all /:pathMatch(.*)* (404).</p><p>Params как пропсы: { path: "/users/:id", props: true } - параметры приходят как пропсы (развязка от роутера, легче тестировать); props: (route) =&gt; ({...}) для трансформации.</p><p>Нюансы: params всегда строки (приводить тип); переиспользование - главный подвох (watch/onBeforeRouteUpdate/key); params в пути vs query после ?; props: true предпочтительно.</p><p>Vue 2 → 3: похоже; Router 4 изменил catch-all (/:pathMatch(.*)* вместо *), новый матчер; useRoute() вместо this.$route.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_003',
+    topicId: 'topic_vue_router',
+    question: 'Как работают вложенные маршруты (nested routes)?',
+    answer:
+      '<p>Вложенные маршруты строят иерархию компонентов, соответствующую вложенности URL: /user/1/profile и /user/1/posts рендерят общий layout с разным содержимым.</p><p>Проблема: приложения имеют вложенную структуру (страница пользователя с вкладками), где общая часть (шапка, навигация) остаётся, вложенная меняется. URL отражает: /user/1/profile, /user/1/posts.</p><p>Настройка через children: { path: "/user/:id", component: User, children: [{ path: "profile", component: UserProfile }, { path: "posts", component: UserPosts }] }. Пути детей относительны родителю (без / в начале): profile → /user/:id/profile.</p><p>Вложенный RouterView: родительский компонент User содержит свой &lt;RouterView /&gt;, куда рендерится дочерний маршрут. Иерархия: внешний RouterView (в App) рендерит User, RouterView внутри User рендерит UserProfile/UserPosts.</p><p>Механика: URL /user/1/posts сопоставляется с цепочкой - родитель /user/:id (User) + ребёнок posts (UserPosts); оба рендерятся вложенно; общая часть (User layout) остаётся при переключении profile/posts.</p><p>Дефолтный дочерний: { path: "", component: UserHome } - /user/1 без сегмента.</p><p>Именованные views: components (мн.) + &lt;RouterView name="..."&gt; - несколько вью на уровне (sidebar + main).</p><p>Нюансы: относительные пути детей (без /, с / - абсолютный); каждый уровень = свой RouterView; переиспользование родителя при переключении детей (не пересоздаётся, сохраняет состояние layout); именованные маршруты удобнее; to.matched - все совпавшие записи (наследование meta).</p><p>Применения: layout с вкладками, админ-панели с sidebar, многоуровневая навигация.</p><p>Vue 2 → 3: одинаково в Router 3 и 4 (children, вложенный RouterView).</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_004',
+    topicId: 'topic_vue_router',
+    question: 'Какие есть navigation guards и в каком порядке они выполняются?',
+    answer:
+      '<p>Navigation guards - функции, перехватывающие навигацию для контроля доступа, редиректов, загрузки данных.</p><p>Три уровня:</p><p>1) Глобальные: router.beforeEach((to, from)) - перед каждой навигацией (аутентификация); router.beforeResolve - перед подтверждением, после in-component guards и async-компонентов; router.afterEach - после навигации, не отменяет (аналитика, document.title).</p><p>2) Per-route: beforeEnter в определении маршрута - только при входе (не при смене params/query того же маршрута).</p><p>3) In-component: beforeRouteEnter(to, from) - перед входом, НЕТ доступа к this (компонент не создан), инстанс через next(vm =&gt; {}); beforeRouteUpdate - при переиспользовании компонента (смена :id), есть this; beforeRouteLeave - перед уходом, есть this (несохранённые изменения). Composition: onBeforeRouteUpdate, onBeforeRouteLeave.</p><p>ПОЛНЫЙ ПОРЯДОК: 1) навигация инициирована; 2) beforeRouteLeave (деактивируемые); 3) глобальный beforeEach; 4) beforeRouteUpdate (переиспользуемые); 5) beforeEnter (конфиг маршрута); 6) разрешение async-компонентов; 7) beforeRouteEnter (активируемые); 8) глобальный beforeResolve; 9) навигация подтверждена; 10) afterEach; 11) DOM-обновления; 12) колбэки next из beforeRouteEnter.</p><p>Управление: return true (разрешить); return false (отменить, URL сбросится на from); return { name: "login" } (редирект). Vue Router 4: возврат значения вместо next() (next поддерживается, но return чище).</p><p>Пример: router.beforeEach((to) =&gt; { if (to.meta.requiresAuth &amp;&amp; !isAuthenticated) return { name: "login", query: { redirect: to.fullPath } } }).</p><p>Нюансы: beforeRouteEnter без this (инстанс через next(vm)); params/query не триггерят enter/leave (только beforeRouteUpdate); async guards (навигация ждёт); inject() в guards (Vue 3.3+); избегать бесконечных редиректов (to.name !== "login"); afterEach не блокирует.</p><p>Vue 2 → 3: guards те же; Router 4 - return-синтаксис, onBeforeRouteUpdate/Leave, inject().</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_005',
+    topicId: 'topic_vue_router',
+    question: 'Как работает программная навигация и useRouter?',
+    answer:
+      '<p>Программная навигация - переход между маршрутами из JS-кода (не через RouterLink), для навигации после действий (форма, логин, редирект).</p><p>Доступ: const router = useRouter() - инстанс для навигации (в отличие от useRoute() для чтения).</p><p>router.push() - переход с добавлением в историю: push("/about"); push({ path: "/about" }); push({ name: "user", params: { id: 1 } }); push({ path: "/search", query: { q: "vue" } }). Добавляет запись в историю (кнопка «назад» вернёт). Аналог клика RouterLink.</p><p>router.replace() - без добавления в историю: replace("/login") или push({ path, replace: true }). Заменяет текущую запись (назад не вернёт). Когда: редиректы (после логина, чтобы назад не вернул на форму), не засорять историю.</p><p>router.go() - по истории: go(1) вперёд, go(-1) назад, go(-3). router.back() = go(-1), forward() = go(1).</p><p>Возврат: await router.push("/dashboard") - промис, резолвится после навигации (или реджектится при отмене guard).</p><p>Сценарии: после логина await auth.signIn(); router.push({ name: "dashboard" }); редирект router.replace("/success") (назад не вернёт на форму); возврат router.back().</p><p>Нюансы: push vs replace (push в историю, replace заменяет для редиректов); дублирующая навигация отклоняется (navigation duplicated); params с path несовместимы (params игнорируются с path, работают с name); промис для дожидания/обработки отмены (isNavigationFailure); useRouter в setup/обработчиках.</p><p>Vue 2 → 3: методы те же; Router 3 - this.$router.push(); Router 4 - useRouter().push(), промисы предсказуемее (без колбэков onComplete/onAbort).</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_006',
+    topicId: 'topic_vue_router',
+    question: 'Что такое route meta и как его использовать?',
+    answer:
+      '<p>Route meta - поле для произвольных метаданных маршрута, не влияющих на сопоставление, но используемых в guards, компонентах, логике.</p><p>Что это: meta: { requiresAuth: true, roles: ["admin"], layout: "dashboard", title: "Админ" } - объект произвольных данных. Vue Router их не интерпретирует, это данные для твоей логики.</p><p>Доступ: в guards to.meta.requiresAuth; в компоненте route.meta (useRoute()).</p><p>Применения:</p><ul><li>Аутентификация (главное): meta: { requiresAuth: true }; beforeEach((to) =&gt; { if (to.meta.requiresAuth &amp;&amp; !isAuthenticated) return { name: "login" } }). Декларативный контроль доступа</li><li>Роли/права: meta: { roles: ["admin", "editor"] }</li><li>Layout: meta: { layout: "admin" } - приложение выбирает layout по meta</li><li>Заголовок: meta: { title }; afterEach((to) =&gt; document.title = to.meta.title)</li><li>Прочее: анимация, sidebar, breadcrumbs, аналитика</li></ul><p>Наследование во вложенных: дочерний маршрут НЕ наследует meta родителя в to.meta напрямую, но все совпавшие записи через to.matched (массив цепочки). Проверка: to.matched.some(record =&gt; record.meta.requiresAuth) - хотя бы один в цепочке требует auth. Ключевой паттерн.</p><p>Типизация (TS): declare module "vue-router" { interface RouteMeta { requiresAuth?: boolean; roles?: string[] } } - типобезопасность meta.</p><p>Нюансы: meta не влияет на сопоставление; to.matched для проверки по всей цепочке (не только to.meta конечного); типизация через declare module; meta + beforeEach = декларативный контроль в одном месте.</p><p>Vue 2 → 3: работает одинаково; Router 4 добавил типизацию RouteMeta через declare module.</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_007',
+    topicId: 'topic_vue_router',
+    question: 'Как работает ленивая загрузка маршрутов (lazy loading)?',
+    answer:
+      '<p>Ленивая загрузка маршрутов - загрузка компонентов страниц по требованию (при переходе), а не в основном бандле. Ключевая оптимизация SPA.</p><p>Проблема: без ленивой загрузки все компоненты всех маршрутов в основном бандле. Пользователь при первой загрузке скачивает код всех страниц, даже непосещаемых. Огромный начальный бандл, медленная первая загрузка.</p><p>Решение: component: () =&gt; import("./views/Dashboard.vue") вместо component: Dashboard. Сборщик выделяет каждый компонент в отдельный чанк, загружаемый только при навигации.</p><p>Что даёт: меньший начальный бандл (код текущей страницы + роутер, остальное по мере посещения); быстрее первая загрузка (меньше JS для парсинга - связь с CRP); code splitting по маршрутам (естественный уровень, страница = единица).</p><p>Именование: import(/* webpackChunkName: "dashboard" */ "./Dashboard.vue") - читаемое имя (webpack); Vite автоматически.</p><p>Группировка: одинаковый webpackChunkName - в один чанк (баланс запросов и размера).</p><p>Загрузка: роутер ждёт загрузки чанка (шаг resolve async route components в порядке guards) перед рендерингом; индикатор через beforeEach/afterEach или Suspense.</p><p>Ошибки: сеть может подвести, чанк не загрузится - обрабатывать (error handler, retry, fallback); при деплоях старые чанки могут исчезнуть.</p><p>Нюансы: гранулярность по маршрутам оптимальна (мелко - много запросов, группировать связанное); prefetch вероятных маршрутов в простое (rel="prefetch"); Nuxt префетчит автоматически; ошибки чанков при деплое (старая версия, чанк удалён).</p><p>Vue 2 → 3: () =&gt; import() одинаково в Router 3 и 4; в Vue 3 не требует оборачивания (роутер обрабатывает промис).</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_008',
+    topicId: 'topic_vue_router',
+    question: 'Как работает scroll behavior и управление прокруткой?',
+    answer:
+      '<p>Scroll behavior - механизм контроля позиции прокрутки при навигации (наверх, сохранить позицию, к якорю).</p><p>Проблема: в SPA страница не перезагружается, позиция прокрутки сохраняется по умолчанию - пользователь переходит на новую страницу прокрученным вниз. Плохой UX (обычно ожидается наверх).</p><p>Решение: scrollBehavior(to, from, savedPosition) в конфиге - функция при каждой навигации, возвращает желаемую позицию. Аргументы: to (куда), from (откуда), savedPosition (при back/forward).</p><p>Сценарии:</p><ul><li>Всегда наверх: return { top: 0 }</li><li>Сохранённая позиция: if (savedPosition) return savedPosition; else return { top: 0 }. savedPosition только при навигации через историю (назад/вперёд) - восстанавливает позицию, как обычные сайты</li><li>К якорю: if (to.hash) return { el: to.hash } - прокрутить к элементу с id из hash</li><li>Плавно: return { top: 0, behavior: "smooth" }</li><li>Задержка (для анимаций): return new Promise((resolve) =&gt; setTimeout(() =&gt; resolve({ top: 0 }), 300)) - отложить до завершения transition</li></ul><p>Смещение к якорю: { el: to.hash, top: 80 } - отступ под фикс-шапку.</p><p>Нюансы: savedPosition только для history-навигации (при push null, при back/forward заполнен - отличить новую навигацию от возврата); промис для отложенной прокрутки (синхронизация с анимациями); el селектор с top для смещения; UX-паттерн - savedPosition при возврате, наверх при новой, к якорю при hash.</p><p>Vue 2 → 3: похоже; Router 4 - { el: to.hash } (было { selector }), { top, left } (было { x, y }). Логика та же.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_009',
+    topicId: 'topic_vue_router',
+    question: 'В чём разница между HTML5 history и hash режимами?',
+    answer:
+      '<p>Режим истории определяет, как роутер представляет URL и взаимодействует с историей браузера.</p><p>HTML5 history (createWebHistory): URL как обычные (example.com/about, /users/1). Использует History API (pushState/replaceState) без перезагрузки. Чистые URL без #, лучше для SEO и вида.</p><p>Hash (createWebHashHistory): URL с хешем (example.com/#/about). Часть после # (/about) - фрагмент URL, НЕ отправляется на сервер (браузер обрабатывает локально). Роутер слушает hashchange.</p><p>Ключевое различие - сервер:</p><p>HTML5 требует серверной настройки: /about - настоящий путь. При обновлении (F5) или прямой ссылке браузер отправляет запрос на сервер за /about; ненастроенный сервер вернёт 404 (есть только index.html). Решение: fallback - возвращать index.html для любого маршрута (nginx try_files $uri $uri/ /index.html). Каждый стек требует настройки.</p><p>Hash не требует настройки: после # не идёт на сервер - сервер получает запрос на корень, отдаёт index.html, роутер обрабатывает hash на клиенте. Обновление/прямая ссылка работает всегда, где угодно (статический хостинг) без конфигурации.</p><p>Сравнение: URL (чистый /about vs /#/about); серверная настройка (требуется vs нет); SEO (лучше vs хуже, # не индексируется); обновление (нужен fallback vs всегда работает).</p><p>Когда: HTML5 (рекомендуется) - чистые URL, SEO, при контроле над сервером; Hash - без контроля над сервером, статический хостинг, ценой # в URL. createMemoryHistory - в памяти, для SSR и тестов.</p><p>Нюансы: HTML5 + полноценное SEO нужен SSR/prerendering (Nuxt); серверный fallback обязателен (частая ошибка деплоя); memory history для SSR.</p><p>Vue 2 → 3: Router 3 - mode: "history"/"hash"; Router 4 - функции createWebHistory()/createWebHashHistory()/createMemoryHistory(), tree-shakeable. Различия те же.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_router_010',
+    topicId: 'topic_vue_router',
+    question: 'Как работают редиректы, алиасы и обработка 404?',
+    answer:
+      '<p>Механизмы перенаправления (redirect), псевдонимов (alias) и обработки несуществующих маршрутов (404).</p><p>Redirect: { path: "/home", redirect: "/" } (строка); redirect: { name: "profile" } (объект); redirect: to =&gt; ({ path: "/new", query: to.query }) (функция, динамический). При переходе на path пользователь перенаправляется, URL МЕНЯЕТСЯ на целевой. Когда: старые URL → новые, дефолтное перенаправление (/ → /dashboard), условная логика.</p><p>Alias: { path: "/", component: Home, alias: "/home" }; alias: ["/people", "/all-users"]. Тот же компонент по нескольким URL, но URL НЕ меняется (в отличие от redirect). На /home виден Home, URL остаётся /home. Отличие: redirect меняет URL, alias сохраняет. Когда: один контент по разным путям без редиректа.</p><p>Обработка 404: { path: "/:pathMatch(.*)*", name: "not-found", component: NotFound } - catch-all сопоставляется с любым несовпавшим путём. Ставится последним (роутер проверяет по порядку, catch-all - fallback). route.params.pathMatch - сам путь (с props: true).</p><p>Редирект на 404: в guard beforeEach((to) =&gt; { if (!routeExists(to)) return { name: "not-found" } }).</p><p>Нюансы: redirect меняет URL, alias - нет (redirect для переехавших, alias для того же контента по путям); функциональный redirect (динамический на основе to.query/params); catch-all последним (первое совпадение выигрывает); 404 в SPA - клиентский (для HTTP 404 нужен SSR); вложенные 404 для секций.</p><p>Vue 2 → 3: redirect/alias одинаково; 404 catch-all изменился - Router 3 path: "*", Router 4 /:pathMatch(.*)* (новый матчер). Частый подвох миграции - старый * не работает.</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Vue: Управление состоянием (Pinia)
+  {
+    id: 'q_vue_state_001',
+    topicId: 'topic_vue_state',
+    question: 'Что такое Pinia и зачем нужно централизованное управление состоянием?',
+    answer:
+      '<p>Pinia - официальная библиотека управления состоянием для Vue, дающая централизованный store для состояния, разделяемого между компонентами.</p><p>Проблема: состояние, нужное многим компонентам (пользователь, корзина, тема). Передавать через пропсы вниз и события вверх (prop drilling) громоздко и хрупко; далёкие компоненты не могут легко делиться. Нужен централизованный источник истины.</p><p>Store - реактивный объект с состоянием и логикой, доступный из любого компонента. defineStore("counter", { state: () =&gt; ({ count: 0 }), getters: { double: (state) =&gt; state.count * 2 }, actions: { increment() { this.count++ } } }). Использование: const counter = useCounterStore(); counter.count; counter.increment(); counter.double.</p><p>Три части: state (реактивные данные); getters (вычисляемые на основе state, как computed); actions (методы, изменяющие state, бизнес-логика, могут быть async).</p><p>Настройка: app.use(createPinia()).</p><p>Особенности: официальная (заменила Vuex); Composition-API-стиль; сильная TS-типизация (автовывод); модульность (много независимых stores, плоская структура); легковесность (~1KB); DevTools (инспекция, частично time-travel).</p><p>Конвенция: useXxxStore - функция, возвращающая store (как composable), вызывается в setup. define, а не create: store не создаётся, пока не вызван (ленивое создание).</p><p>Когда нужно: состояние многих несвязанных компонентов (пользователь, корзина, настройки), сложная логика, состояние переживающее навигацию. НЕ надо: локальное состояние одного компонента (ref/reactive), передача одному-двум потомкам (пропсы).</p><p>Vue 2 → 3: до Pinia стандарт - Vuex (Vue 2 и 3); Pinia официально заменила Vuex как рекомендацию Vue 3 (работает и с Vue 2).</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_002',
+    topicId: 'topic_vue_state',
+    question: 'В чём разница между Options Store и Setup Store синтаксисами?',
+    answer:
+      '<p>Pinia предлагает два синтаксиса defineStore: Options Store (как Options API/Vuex) и Setup Store (как setup/Composition API).</p><p>Options Store (объект): defineStore("counter", { state: () =&gt; ({ count: 0 }), getters: { double: (state) =&gt; state.count * 2, doublePlusOne() { return this.double + 1 } }, actions: { increment() { this.count++ } } }). state - функция (для SSR свежее состояние); getters получают state или this; actions используют this.</p><p>Setup Store (функция): defineStore("counter", () =&gt; { const count = ref(0); const double = computed(() =&gt; count.value * 2); function increment() { count.value++ }; return { count, double, increment } }). ref → state, computed → getters, функции → actions. ОБЯЗАТЕЛЬНО вернуть весь state (Pinia распознаёт по возвращаемым; нельзя приватного - сломается SSR/devtools/плагины).</p><p>Options: плюсы - структурированность, знакомость (Vuex/Options API), автоматическое оборачивание реактивности (не думаешь о ref/computed), меньше нагрузки; для миграции с Vuex, новичков. Минусы - меньше гибкости.</p><p>Setup: плюсы - гибкость (любые composables, watchers внутри store, контроль реактивности - что exposed/приватно через computed, inject() глобального - Router/Route). Минусы - сложнее с composables при SSR; сам управляешь реактивностью; возвращать весь state.</p><p>Контроль мутаций (Setup): const _count = ref(0); return { count: computed(() =&gt; _count.value) } - только чтение снаружи, мутация через exposed-метод.</p><p>Выбор: рекомендация - «удобнее». Options - структура Vuex, миграция, меньше возни; Setup - гибкость (watchers, composables, контроль), комфорт с Composition API.</p><p>Нюансы: state как функция в Options критична для SSR (иначе утечёт между запросами); Setup + composables усложняет SSR; возврат всего state в Setup обязателен; inject() в Setup store.</p><p>Vue 2 → 3: Options напоминает Vuex (без mutations); Setup - Composition стиль, невозможный в Vuex.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_003',
+    topicId: 'topic_vue_state',
+    question: 'Как работают state, getters и actions?',
+    answer:
+      '<p>Три составные части store - state, getters, actions.</p><p>State: state: () =&gt; ({ count: 0, items: [], user: null }) - функция с начальным состоянием (для SSR свежее). Реактивно. Объявлять все свойства (даже undefined/null, иначе Vue не отследит).</p><p>Изменение state: 1) прямая мутация store.count++ (разрешена, в отличие от Vuex!); 2) $patch с объектом store.$patch({ count: 1, name: "New" }) (несколько атомарно); 3) $patch с функцией store.$patch((state) =&gt; { state.items.push(item); state.count++ }) (коллекции, сложные); 4) через action store.increment().</p><p>Getters: getters: { double: (state) =&gt; state.count * 2, doublePlusOne() { return this.double + 1 }, getById: (state) =&gt; (id) =&gt; state.users.find(u =&gt; u.id === id) }. Как computed - кэшируются, пересчёт при изменении зависимостей. Получают state или this (другие геттеры). С аргументами - возвращают функцию (НЕ кэшируются).</p><p>Actions: actions: { increment() { this.count++ }, async fetchUser(id) { this.loading = true; try { this.user = await api.getUser(id) } finally { this.loading = false } } }. Бизнес-логика через this. Могут быть асинхронными (API). Вызывают другие actions/stores.</p><p>Отличие от Vuex - нет mutations: Vuex - state менялся только через mutations (синхронные), async в actions коммитили mutations (двухуровневая церемония). Pinia - mutations удалены, state меняется напрямую или через actions (sync и async). Проще.</p><p>$reset: store.$reset() - сброс state к начальному (только Options Store; в Setup вручную).</p><p>Нюансы: прямая мутация ОК; $patch для группировки/коллекций; геттеры кэшируются (без аргументов); actions - место async; this - инстанс store.</p><p>Vue 2 → 3 (Vuex → Pinia): Vuex - state + mutations + actions + getters (4 концепции); Pinia - state + getters + actions, mutations убраны (3 концепции), this вместо commit/dispatch.</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_004',
+    topicId: 'topic_vue_state',
+    question: 'Почему Pinia заменила Vuex и в чём ключевые отличия?',
+    answer:
+      '<p>Почему Vue-команда сделала Pinia официальной рекомендацией вместо Vuex.</p><p>История: Vuex долго был официальным (Vuex 3 для Vue 2, Vuex 4 для Vue 3). Pinia началась как эксперимент «каким мог быть Vuex 5», вобрала идеи ядра; оказалось, реализует желаемое - сделали рекомендацией (Evan You: «де-факто Vuex 5»). Сейчас Pinia дефолт, Vuex в maintenance mode.</p><p>Отличия:</p><ol><li>Нет mutations (главное): Vuex - обязательные mutations (синхронные) + actions (async) для коммита, многословно. Pinia - mutations удалены, state напрямую или через actions; devtools больше не требуют mutations</li><li>TypeScript: Vuex - сложная типизация, кастомные обёртки, магические строки (commit("increment")) без автодополнения. Pinia - всё типизировано, TS-инференс, импорт функций с автодополнением, нет магических строк</li><li>Плоская структура: Vuex - вложенные модули с namespacing (store.state.moduleA.nested, dispatch("moduleA/action")). Pinia - плоские независимые stores, все namespaced по id, композиция через импорт (даже циклические)</li><li>Множественные stores: Vuex - один store с модулями; Pinia - много независимых (модульность, code splitting)</li><li>Легковесность ~1KB</li><li>Composition-API дизайн (Setup stores)</li></ol><p>Сравнение: концепции (Vuex 4: state/getters/mutations/actions vs Pinia 3: state/getters/actions); изменение (mutations vs напрямую); структура (модули+namespacing vs плоские); TS (магические строки vs автодополнение).</p><p>Сохранилось: mapState/mapActions/mapStores (для Options API); $subscribe (как Vuex subscribe); знакомые концепции минус mutations.</p><p>Миграция: убрать mutations (в actions/прямые), развернуть модули в stores, заменить магические строки на импорты.</p><p>Vue 2 → 3: Vuex в обеих; Pinia рекомендация Vue 3 (совместима с Vue 2). Переход - движение к Composition API и лучшему TS.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_005',
+    topicId: 'topic_vue_state',
+    question: 'Что такое storeToRefs и как правильно деструктурировать store?',
+    answer:
+      '<p>storeToRefs - утилита Pinia для деструктуризации store с сохранением реактивности. Частый источник багов.</p><p>Проблема: const { count, name } = store - ПОТЕРЯ реактивности. Store - реактивный объект (reactive); деструктуризация извлекает текущее значение count, но связь с реактивностью теряется (count становится обычным числом, не обновляется). Та же проблема, что с деструктуризацией reactive-объекта (свойство отрывается от прокси).</p><p>Решение: const { count, name, double } = storeToRefs(store) - реактивные refs, сохраняют связь. В шаблоне разворачиваются ({{ count }}), в скрипте count.value. Actions деструктурируются напрямую: const { increment } = store.</p><p>Что извлекает storeToRefs: state и getters как refs; реактивные плагин-свойства. Пропускает actions и не-реактивные (функции не оборачивать).</p><p>Почему actions напрямую: const { increment, fetchUser } = store - функции, привязанные к store (bound), деструктурируются без потери связи (методы, не реактивные значения). storeToRefs их пропускает.</p><p>Правильный паттерн: const { count, double } = storeToRefs(store) (состояние/геттеры); const { increment, reset } = store (действия).</p><p>Альтернатива: не деструктурировать - store.count, store.increment() в шаблоне. Тоже реактивно (доступ к свойству прокси). Вопрос стиля.</p><p>Нюансы: наивная деструктуризация state/getters ломает реактивность (главный подвох, всегда storeToRefs); actions напрямую (bound); storeToRefs только для реактивных; аналогия с toRefs (умнее, пропускает actions); store.x - альтернатива без деструктуризации.</p><p>Vue 2 → 3: Pinia-специфика; в Vuex проблемы не было (store.state.x/mapState); storeToRefs - следствие reactive-природы Pinia store.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_006',
+    topicId: 'topic_vue_state',
+    question: 'Как работает реактивность в Pinia stores?',
+    answer:
+      '<p>Как Pinia использует реактивную систему Vue под капотом.</p><p>Store - реактивный объект: Pinia построен на реактивной системе Vue (Proxy). Store - по сути reactive-объект вокруг state, getters, actions. Доступ к store.count реактивен (чтение отслеживается, изменение триггерит, как reactive).</p><p>State - reactive: в Options Store state оборачивается в reactive автоматически (не думаешь о ref/reactive); в Setup Store сам создаёшь ref()/reactive() (явный контроль).</p><p>Getters - computed: реализованы как computed - кэшируются, пересчёт только при изменении зависимостей. Геттер от state пересчитается при изменении этого state, иначе закэшированное.</p><p>Actions - методы: обычные функции, привязанные к store (bound this). Не реактивны, но изменяют реактивный state.</p><p>Связь с компонентами: чтение store.count в компоненте отслеживается - компонент зависит от store.count; при изменении компонент перерисовывается (render effect, точечно - только читающие изменившееся). Тот же track/trigger, что с локальным состоянием - Pinia использует Vue-реактивность, не свою.</p><p>Разделяемое состояние: store - синглтон (один инстанс на приложение, ленивое создание). Все useStore() получают тот же инстанс; изменение в одном компоненте отражается во всех читающих. Суть разделяемого реактивного состояния.</p><p>Watch: в Setup Store watch(count, ...) внутри; снаружи watch(() =&gt; store.count, ...); или $subscribe для state целиком.</p><p>Нюансы: store = reactive-объект (отсюда проблема деструктуризации); state reactive, getters computed; тот же track/trigger; синглтон (кроме SSR - инстанс на запрос); state глубоко реактивен (markRaw/shallowRef для оптимизации).</p><p>Vue 2 → 3: Pinia на Proxy-реактивности Vue 3 (свободна от ограничений); Vuex (Vue 2) на Object.defineProperty (не отслеживал добавление, нужен Vue.set).</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_007',
+    topicId: 'topic_vue_state',
+    question: 'Как работает Pinia при SSR и гидратация состояния?',
+    answer:
+      '<p>При SSR управление состоянием требует аккуратности: состояние не должно утекать между запросами, клиент должен гидратировать серверное. Критично для Nuxt.</p><p>Проблема - изоляция: на сервере один процесс обрабатывает много запросов. Если store глобальный синглтон (как на клиенте), состояние утечёт между запросами (данные пользователя A попадут B). Решение: отдельный инстанс Pinia на каждый запрос.</p><p>state как функция - почему критично: state: () =&gt; ({ count: 0 }) - функция, возвращающая свежее состояние. На сервере для каждого запроса вызывается заново → новый объект. Если бы state был объектом, разделялся бы между запросами (утечка). Фундаментальная причина, почему state - всегда функция.</p><p>Создание на запрос: const pinia = createPinia(); app.use(pinia) - каждый запрос свой pinia, изолированные stores.</p><p>Гидратация (server → client): сервер отрендерил HTML с состоянием store; клиент при гидратации должен получить то же (иначе hydration mismatch или повторная загрузка). Решение: 1) сервер сериализует pinia.state.value; 2) внедряет в HTML (window.__INITIAL_STATE__); 3) клиент восстанавливает pinia.state.value = window.__INITIAL_STATE__. Клиентский store стартует с тем же состоянием - без повторной загрузки/mismatch.</p><p>pinia.state - точка гидратации: pinia.state.value - всё состояние всех stores; установка на клиенте = гидратация начального состояния.</p><p>В Nuxt: @pinia/nuxt делает автоматически (Pinia на запрос, сериализация в payload, гидратация). Вручную не нужно.</p><p>Setup Store и SSR: composables внутри усложняют SSR (завязаны на инстанс/запрос); useStore() до первого await в async-actions (иначе потеря правильного инстанса Pinia - контекст запроса).</p><p>Нюансы: state как функция - фундамент SSR; инстанс на запрос (изоляция); гидратация через pinia.state.value; Nuxt автоматизирует; useStore() до await.</p><p>Vue 2 → 3: похоже в Vuex (state-функция, гидратация); Pinia упростила (Nuxt 3).</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_008',
+    topicId: 'topic_vue_state',
+    question: 'Как работают $patch, $reset, $subscribe и $onAction?',
+    answer:
+      '<p>Store instance даёт специальные $-методы для продвинутой работы: групповые изменения, сброс, подписки.</p><p>$patch - групповое изменение: store.$patch({ count: 1, name: "New" }) (объектная, простые поля); store.$patch((state) =&gt; { state.items.push(item); state.hasChanged = true }) (функциональная, коллекции push/splice и сложное). Применяет несколько изменений атомарно (одно срабатывание подписок). Эффективнее нескольких прямых мутаций (батчинг).</p><p>$reset - сброс: store.$reset() - state к начальному (вызывает функцию state заново). Только Options Store автоматически (Pinia знает initial). Setup Store - не работает из коробки (не знает initial), реализовать вручную.</p><p>$subscribe - подписка на изменения state: store.$subscribe((mutation, state) =&gt; { localStorage.setItem("store", JSON.stringify(state)) }). Преимущество над watch: срабатывает раз после патчей ($patch с несколькими → одно срабатывание). mutation содержит type (direct/patch object/patch function), storeId. Применения: персистентность, логирование, синхронизация. { detached: true } - переживает компонент.</p><p>$onAction - подписка на actions: store.$onAction(({ name, store, args, after, onError }) =&gt; { after((result) =&gt; {}); onError((error) =&gt; {}) }). Реагирует на вызов actions - до, после (after), при ошибке (onError). Применения: логирование, аналитика, обработка ошибок централизованно.</p><p>Другие: $state (прямой доступ, замена целиком); $dispose (остановить store); $id.</p><p>Нюансы: $patch для атомарности (одно срабатывание); $subscribe vs watch (раз после патча vs каждое изменение); $reset только Options; $onAction для перехвата; detached подписки.</p><p>Vue 2 → 3 (Vuex → Pinia): Vuex - subscribe (mutations), subscribeAction; Pinia - $subscribe (изменения state, mutations убраны), $onAction; $patch - Pinia-специфика.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_009',
+    topicId: 'topic_vue_state',
+    question: 'Что такое плагины Pinia и как их создавать?',
+    answer:
+      '<p>Плагины Pinia - механизм расширения всех stores через низкоуровневый API: свойства, подписки, обёртки.</p><p>Плагин - функция, получающая контекст, применяемая ко всем stores (созданным после регистрации): function myPlugin(context) { context.pinia; context.app; context.store; context.options }. Регистрация pinia.use(myPlugin), применяется к каждому store при создании.</p><p>Простейший - добавить свойство: pinia.use(() =&gt; ({ hello: "world" })) - каждый store имеет store.hello. Возврат объекта добавляет свойства ко всем (отслеживается devtools).</p><p>Варианты: pinia.use(({ store }) =&gt; { store.hello = "world" }) (прямое) или return { hello: "world" } (для devtools-трекинга).</p><p>Существующие API: pinia.use(({ store }) =&gt; { store.$subscribe(() =&gt; {}); store.$onAction(() =&gt; {}) }) - подписка на изменения/действия всех stores (глобальное логирование, персистентность).</p><p>Кастомные опции: defineStore("search", { actions: {...}, debounce: { searchContacts: 300 } }); pinia.use(({ options, store }) =&gt; { if (options.debounce) { обернуть actions } }). Плагин читает опцию из context.options (конфигурация per-store). В Setup Store опции третьим аргументом defineStore("id", setup, { debounce }).</p><p>Применения: персистентность (localStorage, pinia-plugin-persistedstate); логирование/аналитика ($onAction/$subscribe); общие свойства (роутер, i18n, API-клиент); обёртки actions (debounce, retry); глобальный reset.</p><p>Типизация: PiniaPluginContext для context; declare module "pinia" { interface PiniaCustomProperties { hello: string } } для свойств.</p><p>Нюансы: порядок (только stores после регистрации); return для devtools; кастомные опции через context.options; $subscribe/$onAction в плагине - глобальные подписки; персистентность - частый кейс (готовый плагин).</p><p>Vue 2 → 3: Vuex plugins (подписка на mutations); Pinia-плагины мощнее (свойства, опции, контекст с app/pinia).</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_state_010',
+    topicId: 'topic_vue_state',
+    question: 'Когда использовать Pinia, provide/inject или локальное состояние?',
+    answer:
+      '<p>Выбор инструмента управления состоянием: не всё состояние должно быть в Pinia.</p><p>Три уровня:</p><p>1) Локальное (ref/reactive): const count = ref(0). Когда: состояние только одному компоненту (или 1-2 потомкам через пропсы) - форма, тоглы UI, флаги, временные данные. Просто, инкапсулировано. Правило: по умолчанию локальное, поднимать при необходимости.</p><p>2) provide/inject: provide("theme", theme) в родителе, inject("theme") в потомке. Когда: состояние поддереву - от предка потомкам на разной глубине без prop drilling, но в пределах поддерева (не глобально). Применения: тема/локаль секции, конфигурация формы для вложенных полей, контекст компонентной библиотеки, DI. Отличие: привязан к дереву компонентов (потомки провайдера), живёт с поддеревом.</p><p>3) Pinia: const store = useUserStore(). Когда: многим несвязанным компонентам по приложению, переживает навигацию, сложная логика. Применения: пользователь, корзина, настройки, кэш данных. Отличие: глобальный синглтон, отовсюду, devtools, персистентность, плагины.</p><p>Дерево решений: только этому компоненту → local; поддереву (предок→потомки) не глобально → provide/inject; многим несвязанным/глобально/с логикой → Pinia.</p><p>Антипаттерны: всё в Pinia (класть в глобальный store нужное одному - загрязняет); provide/inject как глобальный store (Pinia лучше - devtools, типизация); prop drilling вместо provide/inject или Pinia.</p><p>Комбинирование: обычно все три (локальное для UI, provide/inject для контекста/DI, Pinia для глобального домена). Правильный инструмент под задачу.</p><p>Composable с общим состоянием (ref вне функции) - лёгкая альтернатива Pinia без devtools/плагинов/SSR; Pinia даёт больше.</p><p>Нюансы: по умолчанию локальное (наименьшая область); provide/inject привязан к дереву, Pinia синглтон (ключевое различие); не всё в Pinia; все три сосуществуют.</p><p>Vue 2 → 3: provide/inject и local в обеих; Pinia - Vue 3 (в Vue 2 Vuex); composables + provide/inject покрывают больше, Pinia для глобального домена.</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Vue: Производительность
-  // Vue: Основы
+  {
+    id: 'q_vue_performance_001',
+    topicId: 'topic_vue_performance',
+    question: 'Какие есть основные подходы к оптимизации производительности Vue?',
+    answer:
+      '<p>Производительность Vue делится на уровни; Senior понимает их системно, а не как набор трюков.</p><p>Принцип - сначала измерить: Vue 3 уже быстр (compiler-informed VDOM, patch flags, block tree). Не оптимизировать вслепую - измерить, найти реальное узкое место, потом точечно. Преждевременная оптимизация усложняет без выгоды.</p><p>Два измерения:</p><p>1) Производительность загрузки: как быстро приложение грузится и становится интерактивным (FCP, LCP, TTI - Core Web Vitals). Техники: code splitting (чанки по требованию); ленивая загрузка компонентов/роутов (defineAsyncComponent, () =&gt; import()); tree shaking (Composition API tree-shakeable); SSR/SSG (быстрый первый контент); ленивая гидратация (Vue 3.5).</p><p>2) Производительность обновлений: как быстро UI реагирует на изменения. Техники: стабилизация пропсов (избегать лишних ре-рендеров детей); v-once/v-memo (пропуск статичных/мемоизированных); shallowRef/shallowReactive (ограничить глубину реактивности); виртуализация списков (только видимые); computed (кэш); разбиение компонентов (изоляция ре-рендеров).</p><p>Уровни: сборка (splitting, tree shaking, минификация); приложение (SSR/SSG, ленивая загрузка, архитектура); компонент (пропсы, v-memo, разбиение, computed); реактивность (shallowRef, markRaw, точечные зависимости); DOM (виртуализация, v-show vs v-if).</p><p>Диагностика: Vue DevTools (дерево, timeline, ре-рендеры); onRenderTracked/onRenderTriggered; Lighthouse (Core Web Vitals); browser profiler (CPU, память); app.config.performance; анализатор бандла.</p><p>Нюансы: измерять, потом оптимизировать; два измерения (загрузка и обновления - разные техники); Vue 3 уже оптимизирован; архитектура важнее микрооптимизаций.</p><p>Vue 2 → 3: Vue 3 быстрее автоматически (рендерер, tree-shakeable API, реактивность); новые - v-memo, shallowRef, ленивая гидратация (3.5), Vapor Mode (3.6).</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_performance_002',
+    topicId: 'topic_vue_performance',
+    question: 'Как избегать лишних ре-рендеров через стабилизацию пропсов?',
+    answer:
+      '<p>Стабилизация пропсов - чтобы дочерние компоненты не перерисовывались без необходимости.</p><p>Правило обновления: дочерний компонент обновляется, когда хотя бы один проп изменился; если пропсы те же (ссылки/значения) - не перерисовывается. Лишние ре-рендеры - когда родитель передаёт «новые» пропсы, логически те же.</p><p>Причина 1 - новые ссылки: &lt;ExpensiveChild :config="{ theme: "dark", limit: 10 }" /&gt; - при каждом ре-рендере родителя новый объект/функция (новая ссылка), потомок видит «изменившийся» проп и перерисовывается. Решение: const childConfig = { theme: "dark", limit: 10 }; :config="childConfig" - вынести в стабильную переменную (или computed для производных), ссылка не меняется.</p><p>Причина 2 - широкий проп (ключевой паттерн): &lt;ListItem v-for :id="item.id" :activeId="activeId" /&gt; - ListItem использует id и activeId для активности; при смене activeId ВСЕ items обновляются, хотя изменение затрагивает два (старый и новый активный). Решение: перенести вычисление в родителя, передавать узкий boolean :active="item.id === activeId" - для большинства active останется тем же (false), обновятся только два. Передавать вычисленное значение, а не сырые данные.</p><p>Причина 3 - нестабильные slots/inline-обработчики: inline-функции создают новые ссылки, выносить для критичных.</p><p>Нюансы: стабильные пропсы = меньше ре-рендеров; выносить объекты/функции/массивы из inline; узкие пропсы (boolean active), а не широкие данные (смещает вычисление в родителя, сокращает ре-рендеры); применять для тяжёлых компонентов/больших списков; computed для производных пропсов (кэш, стабилизация).</p><p>Vue 2 → 3: актуально в обеих; Vue 3 (точечная реактивность, patch flags) смягчает, но новые ссылки триггерят обновление потомка. Приём универсален.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_performance_003',
+    topicId: 'topic_vue_performance',
+    question: 'Как shallowRef и shallowReactive помогают производительности?',
+    answer:
+      '<p>shallowRef/shallowReactive - поверхностные версии реактивности, ограничивающие отслеживание только верхним уровнем. Для больших структур данных.</p><p>Проблема: ref/reactive создают глубокую реактивность - Vue рекурсивно оборачивает все вложенные объекты в Proxy, отслеживая на любой глубине. Для больших/глубоко вложенных структур (тысячи объектов, деревья) дорого: настройка всех уровней = O(n) оверхед, память на прокси, отслеживание. Если глубокая реактивность не нужна (данные меняются целиком) - лишняя работа.</p><p>Решение: const shallowArray = shallowRef([большой список]). shallowRef - реактивность только на корне (.value); вложенные объекты не оборачиваются (быстрый доступ). shallowReactive - то же для объектов (реактивны свойства верхнего уровня).</p><p>Обновление: НЕ триггерит (вложенное не отслеживается) shallowArray.value.push(obj), shallowArray.value[0].foo = 1; ТРИГГЕРИТ (замена корня) shallowArray.value = [...shallowArray.value, obj]. Trade-off: вложенные как иммутабельные, обновления через замену корня (.value = новый). Мутация вложенного не сработает.</p><p>Эффект: быстрый доступ к вложенным (нет прокси-обёрток); меньше памяти (прокси только на корне); меньше работы при настройке (нет рекурсивного обхода). Заметно для больших датасетов (таблицы, списки с сервера).</p><p>Применения: большие списки/таблицы (не мутируемые по вложенным); данные с сервера (заменяются целиком); иммутабельные структуры; внешние библиотеки (с markRaw).</p><p>markRaw: пометить объект как никогда не реактивный (Vue не оборачивает). Для сторонних инстансов (карты, чарты).</p><p>Нюансы: только корень реактивен; обновление заменой корня (иммутабельный паттерн); для больших структур; markRaw для полного исключения; осторожность (легко забыть, что вложенное не реактивно - баг).</p><p>Vue 2 → 3: shallowRef/shallowReactive/markRaw - Vue 3 (Proxy); в Vue 2 не было shallow-контроля.</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_performance_004',
+    topicId: 'topic_vue_performance',
+    question: 'Как работает виртуализация списков?',
+    answer:
+      '<p>Виртуализация (virtual scrolling) - рендеринг только видимых элементов длинного списка вместо всех. Для больших списков (тысячи+ элементов).</p><p>Проблема: рендеринг тысяч DOM-элементов дорог - много узлов = медленный первый рендер, потребление памяти, тормоза при скролле/обновлении. Браузер не справляется с десятками тысяч узлов.</p><p>Идея: рендерить только элементы, видимые во вьюпорте (плюс буфер), не весь список. По прокрутке рендерить появляющиеся, удалять ушедшие. Пользователь видит полный список (по скроллу), но в DOM только малое число (на экране).</p><p>Механика: контейнер с фиксированной высотой и полосой прокрутки на полный размер (spacer/padding для правильного скроллбара); отслеживается позиция скролла → вычисляется видимый диапазон (по индексам, высоте); рендерятся только эти, позиционируются (transform/absolute); при скролле пересчёт, рендер новых, удаление старых. Для 10000+ элементов в DOM &lt;100 узлов, плавный скролл 60fps независимо от размера.</p><p>Реализация: готовые библиотеки. &lt;RecycleScroller :items="list" :item-size="32" v-slot="{ item }"&gt;{{ item.name }}&lt;/RecycleScroller&gt;. vue-virtual-scroller (RecycleScroller переиспользует узлы), @tanstack/vue-virtual. Указываешь items и item-size.</p><p>Виды: фиксированная высота (проще, точный расчёт); переменная (сложнее, измерять высоты); windowing (окно + буфер).</p><p>Когда: длинные списки/таблицы (сотни-тысячи+) - ленты, логи, таблицы, бесконечная прокрутка. НЕ надо: короткие (десятки) - обычный v-for проще.</p><p>Нюансы: только видимое в DOM; готовые библиотеки (не изобретать); key важен; переменная высота сложнее; сочетать с ленивой загрузкой данных, shallowRef; ограничения (sticky, Ctrl+F не найдёт не отрендеренное).</p><p>Vue 2 → 3: паттерн не зависит от версии (библиотеки для обеих); с shallowRef эффективнее.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_performance_005',
+    topicId: 'topic_vue_performance',
+    question: 'Как работает code splitting и ленивая загрузка компонентов?',
+    answer:
+      '<p>Code splitting - разбиение бандла на меньшие чанки, загружаемые по требованию, для ускорения первой загрузки.</p><p>Проблема: без разбиения весь код в одном бандле; пользователь скачивает всё, даже ненужное сразу. Большой бандл = медленный парсинг = медленная интерактивность (TTI).</p><p>Code splitting: сборщик (Vite/Rollup, webpack) разбивает на чанки по требованию/параллельно, обнаруживая ESM динамический импорт: function loadLazy() { return import("./lazy.js") } - lazy.js и зависимости в отдельный чанк.</p><p>Ленивая загрузка компонентов: const HeavyChart = defineAsyncComponent(() =&gt; import("./HeavyChart.vue")) - компонент не в основном бандле, грузится отдельным чанком при первом рендеринге. Когда: тяжёлые, не нужные сразу (модалки, чарты, редакторы, табы не на первом экране).</p><p>С состояниями: defineAsyncComponent({ loader, loadingComponent, errorComponent, delay, timeout }).</p><p>Ленивая загрузка роутов: { path: "/dashboard", component: () =&gt; import("./Dashboard.vue") } - настоятельно рекомендуется (документация). Роут = чанк, самый эффективный уровень.</p><p>Тяжёлые библиотеки: async function showChart() { const { Chart } = await import("chart.js") } - динамически при использовании, не в основной бандл. Не дошедшие до фичи не скачивают код.</p><p>По видимости: Intersection Observer (useIntersectionObserver из @vueuse/core) - компоненты ниже сгиба при прокрутке (галереи, комментарии).</p><p>Suspense: &lt;Suspense&gt;&lt;template #default&gt;&lt;AsyncComponent /&gt;&lt;/template&gt;&lt;template #fallback&gt;&lt;LoadingSpinner /&gt;&lt;/template&gt;&lt;/Suspense&gt; - координирует async с fallback.</p><p>Нюансы: ESM import() - триггер splitting; роуты приоритет; тяжёлые библиотеки динамически; prefetch (вероятные чанки в простое, на hover); баланс гранулярности (мелко - много запросов); tree shaking (Composition API tree-shakeable).</p><p>Vue 2 → 3: () =&gt; import() в обеих; defineAsyncComponent/Suspense/tree-shakeable API - Vue 3.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_performance_006',
+    topicId: 'topic_vue_performance',
+    question: 'Что такое ленивая гидратация и как оптимизировать SSR-производительность?',
+    answer:
+      '<p>Ленивая гидратация - отложенное «оживление» серверного HTML до момента, когда компонент нужен, для ускорения интерактивности SSR. Vue 3.5. Детали могут развиваться - сверяться с документацией.</p><p>Проблема: в SSR сервер отдаёт HTML (быстрый контент), клиент гидратирует - навешивает реактивность на всю разметку. Гидратация всего сразу дорогая (выполнить весь JS, обойти дерево); до завершения приложение не интерактивно - большой TTI, особенно на слабых устройствах. Многое гидратируется зря (футер, виджеты, контент ниже сгиба).</p><p>Ленивая гидратация (3.5): откладывать гидратацию некритичных компонентов до момента нужды. Стратегии гидратации async-компонентов: on visible (во вьюпорте, Intersection Observer); on idle (requestIdleCallback); on interaction (клик/ховер); on media query. Критичный контент интерактивен быстро, остальное оживает по надобности - меньше работы на старте, лучше TTI.</p><p>Другие SSR-техники: островная архитектура (гидратировать только интерактивные острова, статику оставить HTML - Nuxt Islands); streaming SSR (HTML чанками по мере рендеринга через renderToStream, контент выше сгиба сразу, Suspense-границы); server components (рендер на сервере, не отправляя JS); минимизация hydration mismatch (избегать Date.now()/Math.random()/window, useId 3.5); оптимизация payload (только нужное).</p><p>Связь с Nuxt: реализует SSR/SSG/гибридный, управляет гидратацией, payload, островной архитектурой, ленивой гидратацией.</p><p>Нюансы: гидратация - узкое место SSR (не рендеринг, а оживление на клиенте); ленивая (3.5) откладывает некритичное; острова (только интерактивное); streaming (чанки); mismatch избегать (детерминированный рендер, useId); Nuxt автоматизирует.</p><p>Vue 2 → 3: SSR был; Vue 3 улучшил гидратацию (частичная/ленивая 3.5, useId); острова/streaming - эра Vue 3/Nuxt 3.</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_performance_007',
+    topicId: 'topic_vue_performance',
+    question: 'Как правильно использовать computed, watch и избегать лишней реактивной работы?',
+    answer:
+      '<p>Эффективное использование реактивных примитивов: computed (кэш), правильные watch, debounce/throttle.</p><p>computed - кэширование: кэширует результат, пересчёт только при изменении зависимостей; пока те же - закэшированное. Для производных данных вместо метода/inline: ПЛОХО function filteredList() { return list.value.filter(...) } (пересчёт на каждый рендер); ХОРОШО const filteredList = computed(() =&gt; list.value.filter(...)) (кэш, пересчёт при изменении list). Метод в шаблоне {{ filteredList() }} на каждый ре-рендер; computed при изменении зависимостей. Для дорогих - большая разница.</p><p>Избегать тяжёлого в шаблоне: inline-выражения на каждый рендер, дорогое - в computed.</p><p>Правильные watchers: watch только когда нужен побочный эффект (запрос, синхронизация, императивное). Для производных - computed, не watch: ПЛОХО watch(count, () =&gt; { double.value = count.value * 2 }); ХОРОШО const double = computed(() =&gt; count.value * 2).</p><p>Точечные зависимости: watch(() =&gt; obj.specificField, ...) - точечно, а не большой объект (иначе на любое изменение). deep: true дорог для больших структур, только при необходимости.</p><p>Debounce/throttle: для частых событий (ввод, скролл, resize, API) - watchDebounced(searchQuery, fetchResults, { debounce: 300 }). Дебаунс поиска: не запрос на каждую букву, а после паузы. Снижает работу.</p><p>flush: post (после DOM), pre (до), sync (синхронно). sync дорог (на каждое изменение) - избегать.</p><p>Остановка: watchers в setup авто-останавливаются; ручные/асинхронные - stop() (утечки).</p><p>Нюансы: computed для производных (кэш) вместо метода/watch; watch только для побочных эффектов; точечные зависимости (deep дорог); debounce/throttle для частых; sync избегать; останавливать ручные.</p><p>Vue 2 → 3: были в обеих; Vue 3 - функции computed()/watch()/watchEffect() с контролем (flush, точечные, onCleanup).</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_vue_performance_008',
+    topicId: 'topic_vue_performance',
+    question: 'Как профилировать и диагностировать проблемы производительности?',
+    answer:
+      '<p>Инструменты и методология диагностики: найти реальные узкие места перед оптимизацией. Подход «измерь, потом оптимизируй».</p><p>Принцип: не гадать, где медленно - измерить. Интуиция ошибается; оптимизировать реальные узкие места, иначе усложняешь код без выгоды.</p><p>Инструменты:</p><ul><li>Vue DevTools (главный): дерево компонентов (пропсы, состояние); timeline/Performance (ре-рендеры, время); поиск «горячих» компонентов (часто перерисовывающихся)</li><li>Отладочные хуки: onRenderTriggered (какое изменение вызвало ре-рендер - виновник); onRenderTracked (зависимости - неожиданные/лишние)</li><li>app.config.performance = true: метрики компонентов в Performance timeline (время инициализации/рендеринга)</li><li>Browser DevTools Performance: CPU-профилирование (flame charts); Memory (утечки, detached DOM, heap snapshots); Rendering (reflow/repaint, layout thrashing)</li><li>Lighthouse: Core Web Vitals (LCP, INP, CLS), FCP, TTI; оценка загрузки</li><li>Анализатор бандла (rollup-plugin-visualizer): что раздувает, тяжёлые зависимости</li></ul><p>Методология: 1) определить симптом (загрузка/скролл/ввод/навигация); 2) выбрать инструмент (загрузка → Lighthouse+бандл; ре-рендеры → DevTools+onRenderTriggered; тормоза → profiler; память → Memory); 3) измерить (воспроизвести с профилировщиком); 4) найти узкое место (компонент/функция/чанк); 5) целевая оптимизация; 6) измерить снова (регрессионное сравнение).</p><p>Диагнозы → решения: часто перерисовывается → onRenderTriggered → стабилизация пропсов/v-memo; медленная загрузка → Lighthouse/бандл → splitting/ленивая/SSR; длинный список → виртуализация; растёт память → Memory → утечки (подписки/таймеры); дорогие вычисления → computed.</p><p>Нюансы: измерять, потом оптимизировать; инструмент под тип; воспроизводимость (prod-сборка, throttling CPU/сети); регрессионное сравнение до/после; prod vs dev (dev медленнее).</p><p>Vue 2 → 3: DevTools для Vue 3; onRenderTracked/onRenderTriggered - Vue 3; app.config.performance - обе. Подход универсален.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  // Nuxt: Основы
+  {
+    id: 'q_nuxt_fundamentals_001',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Что такое Nuxt и какие проблемы он решает поверх Vue?',
+    answer:
+      '<p>Nuxt - мета-фреймворк над Vue, добавляющий production-инфраструктуру (SSR, маршрутизацию, сервер, конвенции), которую иначе настраивают вручную.</p><p>Что это: фреймворк над Vue для полноценных (full-stack) приложений - серверный рендеринг, файловая маршрутизация, серверная часть, оптимизации из коробки. Vue сам - библиотека представления (компоненты, Composition API); Nuxt добавляет всё вокруг для production, чего в чистом Vue нет.</p><p>Проблемы, которые решает: 1) SSR/SSG из коробки (без ручной настройки Node-сервера, сборки, гидратации); 2) файловая маршрутизация (автоматически из pages/); 3) серверная часть Nitro (API-роуты, middleware, full-stack без Express); 4) auto-imports (компоненты, composables, Vue API без import, с tree-shaking); 5) оптимизации (code splitting, SSR-совместимая загрузка); 6) конвенции над конфигурацией (структура каталогов pages/components/composables/layouts); 7) zero-config TypeScript (типизированные роуты, API); 8) гибкий деплой через Nitro (одна база → Node/serverless/edge/static); 9) модули (@nuxt/image, @nuxt/content, i18n, auth).</p><p>Отличие от Vue: Vue - библиотека UI, строит SPA, роутинг/SSR/сервер настраиваешь сам; Nuxt - production-инфраструктура поверх Vue готовая.</p><p>Стек Nuxt 3/4: Vue 3, Vite (сборка/HMR), Nitro (серверный движок). Nuxt 3 текущая (с 2022), Nuxt 4 к 2026.</p><p>Когда: Nuxt - SSR/SSG, SEO-критичное, full-stack, конвенции; чистый Vue - контролируемое SPA, виджеты, без SSR/сервера.</p><p>Нюансы: Nuxt = Vue + инфраструктура; Nitro - сердце full-stack и деплоя; конвенции вместо конфигурации; универсальность деплоя.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 на Vue 2 (webpack, без Nitro); Nuxt 3 на Vue 3/Vite/Nitro, гибридный рендеринг, auto-imports. Не drop-in миграция (server-first модель).</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_002',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Какие есть режимы рендеринга в Nuxt?',
+    answer:
+      '<p>Nuxt поддерживает режимы рендеринга - где и когда генерируется HTML.</p><p>1) Universal (SSR) - по умолчанию: HTML на сервере на каждый запрос, отдаётся готовым, гидратируется на клиенте. ssr: true. Плюсы: быстрый первый контент, отличное SEO, лучше на слабых устройствах, доступность. Минусы: нагрузка на сервер, сложнее (universal-код, гидратация). Когда: динамический контент, SEO, персонализация.</p><p>2) SPA (ssr: false): HTML пустой на сервере, всё в браузере после JS (классическое Vue SPA). Плюсы: нет серверного рендера (дешевле хостинг), интерактивность. Минусы: плохое SEO (пустой HTML), медленный первый контент, хуже на слабых. Когда: за авторизацией без SEO (админки, дашборды). Нюанс: spa-loading-template.html (экран загрузки).</p><p>3) SSG (prerender): страницы пре-рендерятся в статические HTML на сборке (nuxt generate или prerender: true), отдаются как статика (CDN). Плюсы: максимальная производительность (TTFB &lt;50ms, идеальные Core Web Vitals), дёшево, безопасно. Минусы: контент замораживается до пересборки. Когда: редко меняющийся (маркетинг, блоги, доки). Нюанс: при prerender нет серверных эндпоинтов.</p><p>4) ISR (isr в routeRules): генерируется по требованию, кэшируется на CDN, перегенерируется в фоне по TTL. isr: true (до деплоя) или isr: 3600 (TTL). Когда: регулярно обновляющийся, терпящий устарелость (каталоги, блоги). Нюанс: требует CDN (Vercel, Netlify).</p><p>5) SWR (swr): как ISR, но кэш на сервере/reverse-proxy (не CDN). swr: true/3600. Отличие: ISR на CDN, SWR на сервере.</p><p>Настройка: routeRules: { "/": { prerender: true }, "/products": { swr: 3600 }, "/blog/**": { isr: true }, "/admin/**": { ssr: false } }.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - один режим на всё (target static/server); Nuxt 3 (Nitro) - per-route (гибридный) + ISR/SWR.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_003',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Как работает гибридный рендеринг и routeRules?',
+    answer:
+      '<p>Гибридный рендеринг - разные режимы рендеринга к разным маршрутам одного приложения через routeRules. Ключевая фича Nuxt 3 (Nitro).</p><p>Проблема (Nuxt 2): один режим на всё приложение (target static/server), все роуты одну стратегию. Реальные приложения смешанные (маркетинг статика, товары свежие, дашборды динамика, админка SPA); один режим = компромисс (статика устаревшие данные, SSR тратит CPU на неизменное).</p><p>Решение через Nitro: Nuxt 3 использует Nitro (серверный движок) с per-route стратегиями. Конфигурируется routeRules в nuxt.config.ts - правила для паттернов маршрутов, Nitro применяет поведение.</p><p>Пример: routeRules: { "/": { prerender: true } (SSG), "/products": { swr: true } (SWR), "/products/**": { swr: 3600 } (SWR TTL час), "/blog": { isr: 3600 } (ISR CDN час), "/blog/**": { isr: true } (ISR до деплоя), "/admin/**": { ssr: false } (SPA), "/api/**": { cors: true }, "/old-page": { redirect: "/new-page" } }. Nitro регистрирует middleware и оборачивает кэш-обработчиками.</p><p>Свойства: prerender: true (SSG); ssr: false (SPA/client-only); swr: number|boolean (серверный кэш TTL); isr: number|boolean (CDN-кэш TTL); cors: true; headers: {} (кастомные); redirect.</p><p>Пример e-commerce: маркетинг → SSG; список товаров → ISR/SWR; страница товара → ISR; дашборд → SSR; админка → SPA. В одной базе, одном конфиге.</p><p>SEO/производительность: SSR/SSG отдают мета-теги краулерам сразу; статические/кэшированные - скорость (CDN); динамические - свежесть. Баланс per-route.</p><p>Нюансы: per-route стратегии (главная фича); Nitro (движок, кэш-слой); routeRules декларативно; паттерны /blog/** (glob); деплой (Nitro адаптирует, edge возможен).</p><p>Vue 2 → 3 (Nuxt 2 → 3): новинка Nuxt 3 (Nitro); Nuxt 2 не мог смешивать. Главное архитектурное улучшение.</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_004',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Как работает файловая маршрутизация в Nuxt?',
+    answer:
+      '<p>Файловая маршрутизация - автоматическое создание маршрутов из структуры pages/, без ручной конфигурации Vue Router.</p><p>Идея: Nuxt генерирует конфигурацию Vue Router из файлов в pages/. Структура файлов = структура маршрутов.</p><p>Базовое сопоставление: index.vue → /; about.vue → /about; users/index.vue → /users; users/profile.vue → /users/profile. Вложенные папки → вложенные пути.</p><p>Динамические (квадратные скобки): users/[id].vue → /users/:id (users/1, users/42); posts/[slug].vue → /posts/:slug. Параметр через useRoute().params.id.</p><p>Множественные/вложенные: users/[id]/posts/[postId].vue → /users/:id/posts/:postId.</p><p>Catch-all: [...slug].vue → /:slug(.*)* (любой путь, 404 или динамика). Аналог /:pathMatch(.*)* Vue Router.</p><p>Вложенные маршруты: parent.vue (родительский layout с &lt;NuxtPage /&gt;) + папка parent/ → parent/child.vue рендерится внутри parent.vue. NuxtPage - аналог вложенного RouterView.</p><p>Навигация: &lt;NuxtLink to="/about"&gt; (аналог RouterLink с prefetch по умолчанию); &lt;NuxtPage /&gt; (где рендерится страница, аналог RouterView); navigateTo() (программно, работает на сервере); useRouter()/useRoute() (auto-import).</p><p>Опциональные: [[slug]].vue.</p><p>Нюансы: файл = маршрут; [param] динамический, [...slug] catch-all; parent.vue + parent/ вложенные с NuxtPage; NuxtLink с prefetch; Vue Router 4 под капотом (guards, meta, params применимы); definePageMeta (meta/middleware/layout в компоненте); ленивая загрузка (авто code-split).</p><p>Vue 2 → 3 (Nuxt 2 → 3): синтаксис изменился - Nuxt 2 _id.vue (подчёркивание), Nuxt 3 [id].vue (скобки); catch-all Nuxt 2 _.vue, Nuxt 3 [...slug].vue; Vue Router 4.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_005',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Как работают auto-imports в Nuxt?',
+    answer:
+      '<p>Auto-imports - автоматический импорт компонентов, composables, Vue/Nuxt API без явных import-строк.</p><p>Что это: Nuxt автоматически импортирует используемые сущности - не пишешь import вручную. Используешь ref, useFetch, свой компонент/composable - Nuxt подставит импорт при сборке.</p><p>Что автоимпортируется:</p><ul><li>Vue API: const count = ref(0); computed, watch, onMounted - без import { ref } from "vue"</li><li>Nuxt composables: useRoute(), useFetch(), useRouter(), useState, useHead, navigateTo - без импорта</li><li>Компоненты из components/: &lt;MyButton /&gt; (components/MyButton.vue) по имени файла; вложенные папки → префикс (components/base/Button.vue → &lt;BaseButton /&gt;)</li><li>Свои composables из composables/: const { user } = useAuth() (composables/useAuth.ts); утилиты из utils/</li></ul><p>Механика: Nuxt сканирует директории (components/, composables/, utils/) и Vue/Nuxt API, генерирует авто-импорты при сборке. Tree-shaking сохраняется (неиспользуемое не в бандле).</p><p>Преимущества: чистый код (нет списков импортов); DX (быстрее, меньше бойлерплейта); tree-shaking (только используемое).</p><p>Настройка/границы: сторонние пакеты (imports/components в nuxt.config); отключение в конфиге; явный импорт работает (import { useFetch } from "#imports").</p><p>Нюансы: компоненты по имени файла (префикс папки base/Button → BaseButton); composables/utils из папок авто; Vue/Nuxt API без импорта; tree-shaking сохраняется; #imports (явный доступ для линтеров); границы контекста (Nuxt 4 - app/server/shared); осторожность (магия может путать - откуда useFoo?, именование важно).</p><p>Vue 2 → 3 (Nuxt 2 → 3): auto-import компонентов был в Nuxt 2 (components: true); Nuxt 3 расширил до composables, Vue/Nuxt API, utils.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_006',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Что такое Nitro и как работает серверный движок Nuxt?',
+    answer:
+      '<p>Nitro - серверный движок Nuxt 3, обеспечивающий full-stack: SSR, серверные API, middleware, универсальный деплой.</p><p>Что это: серверный движок в основе Nuxt 3, отвечающий за серверную часть - рендеринг на сервере (SSR), API-роуты, middleware, кэширование, сборку для деплоя. Делает Nuxt 3 full-stack (не только фронтенд).</p><p>Возможности:</p><ul><li>SSR: выполняет Vue-код на сервере, генерируя HTML для universal-рендеринга</li><li>Серверные API-роуты: server/api/hello.ts → export default defineEventHandler((event) =&gt; ({ message: "Hello" })) доступно на /api/hello. Файлы в server/api/ - эндпоинты автоматически (без Express). defineEventHandler получает event с request/response</li><li>Серверные middleware: server/middleware/ - на каждый запрос</li><li>Кэширование: кэш-слой, реализует ISR/SWR из routeRules</li><li>Универсальный деплой (главное): в production собирает приложение и сервер в один .output каталог (лёгкий, минифицирован, без Node-модулей кроме полифиллов), деплоится на любую платформу с JS: Node, serverless (Lambda), edge (Cloudflare Workers), Vercel, Netlify, Deno, Bun, статика. Deployment presets абстрагируют платформу - одна база под любую без изменений конфига; Vercel/Cloudflare автоопределяются (zero-config)</li></ul><p>Dev vs prod: разработка - Rollup и Node.js workers с изоляцией контекста, генерирует API/middleware из файлов; production - всё в .output (универсальный, лёгкий).</p><p>Важность: развязка от платформы (пиши раз, деплой куда угодно); full-stack без отдельного бэкенда (API/middleware в проекте); edge-возможности (Cloudflare Workers, низкая latency).</p><p>Нюансы: Nitro = серверный движок; server/api/ → эндпоинты; .output универсальный артефакт; presets (любая платформа, автоопределение); full-stack; Nitro автономен (вне Nuxt).</p><p>Vue 2 → 3 (Nuxt 2 → 3): новинка Nuxt 3 (в Nuxt 2 не было, Express/Koa-подобный сервер); ядро server-first модели.</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_007',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Как устроена структура каталогов Nuxt-проекта?',
+    answer:
+      '<p>Nuxt использует конвенции над конфигурацией - специальные каталоги с назначением, обрабатываемые автоматически.</p><p>Каталоги: pages/ (страницы и маршруты - файловая маршрутизация, index.vue → /); components/ (переиспользуемые компоненты, автоимпорт по имени файла); composables/ (переиспользуемая логика, автоимпорт - useAuth.ts → useAuth()); layouts/ (макеты-обёртки: шапка/подвал/навигация, default.vue дефолтный, через definePageMeta({ layout }), содержит &lt;slot /&gt;); server/ (Nitro: api/ - эндпоинты, middleware/ - серверные, routes/ - не под /api); middleware/ (route middleware навигационные, перед навигацией - auth.ts); plugins/ (код при инициализации приложения - Vue-плагины, директивы, автозагрузка); assets/ (ассеты, обрабатываемые Vite); public/ (статика как есть с корня, favicon.ico → /favicon.ico); utils/ (автоимпортируемые утилиты).</p><p>Файлы: nuxt.config.ts (главная конфигурация - режимы, модули, routeRules, runtime config); app.vue (корневой компонент, обёртка над NuxtPage); app.config.ts (реактивная рантайм-конфигурация); .env (переменные окружения); error.vue (страница ошибок).</p><p>Nuxt 4 - каталог app/: клиентский код в app/ (app/pages/, app/components/, app/composables/), server/ и shared/ отдельно. Разделение client/server/universal, раздельные типы-контексты для IDE.</p><p>Как работает: Nuxt автоматически обрабатывает каталоги по назначению (сканирует pages/ для роутинга, components/ для авто-импортов, server/ для Nitro). Конвенция над конфигурацией - положил файл в правильный каталог, Nuxt знает, что делать.</p><p>Нюансы: каждый каталог = назначение; pages/ роутинг, server/ Nitro, components/composables/ авто-импорт, layouts/ макеты, middleware/ хуки, plugins/ инициализация; nuxt.config.ts центральный; public/ (как есть) vs assets/ (сборщик); Nuxt 4 app/.</p><p>Vue 2 → 3 → 4: Nuxt 2 - pages/, store/ (Vuex); Nuxt 3 - добавил server/ (Nitro), composables/, убрал store/ (Pinia); Nuxt 4 - app/ каталог.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_008',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Как работают layouts (макеты) в Nuxt?',
+    answer:
+      '<p>Layouts - механизм общих обёрток вокруг страниц: шапка, подвал, навигация, sidebar, переиспользуемые без дублирования.</p><p>Проблема: многие страницы делят общую структуру (шапка, навигация, подвал); дублировать в каждой плохо. Layouts выносят общую обёртку.</p><p>Как работают: layouts/default.vue с &lt;template&gt;&lt;AppHeader /&gt;&lt;slot /&gt;&lt;AppFooter /&gt;&lt;/template&gt;. Файлы в layouts/ - макеты; &lt;slot /&gt; - место контента текущей страницы. default.vue - по умолчанию (все страницы без явного указания).</p><p>Использование: definePageMeta({ layout: "admin" }) - использовать layouts/admin.vue.</p><p>Несколько: layouts/default.vue (по умолчанию), admin.vue (админка), auth.vue (логин/регистрация) - для разных секций.</p><p>Отключение/смена: definePageMeta({ layout: false }) (без макета); setPageLayout("admin") (программно).</p><p>NuxtLayout: &lt;NuxtLayout&gt;&lt;NuxtPage /&gt;&lt;/NuxtLayout&gt; в app.vue - оборачивает страницу в макет, можно указать пропсом.</p><p>Вложенность/слоты: макет может иметь именованные слоты (отдельный слот для sidebar страницы); вложенные макеты для сложных структур.</p><p>Layout vs компонент: layout - обёртка уровня страницы (структура вокруг контента), per-page; компонент - переиспользуемый UI-блок (кнопка, карточка), внутри страниц. Layout про структуру, компонент про UI-элементы.</p><p>Нюансы: default.vue дефолтный, &lt;slot /&gt; для контента; definePageMeta({ layout }) per-page; несколько для секций; layout: false без макета, setPageLayout() смена; NuxtLayout обёртка; layout vs компонент; переходы (page/layout transitions).</p><p>Vue 2 → 3 (Nuxt 2 → 3): были в Nuxt 2 (layouts/, свойство layout Options API, &lt;Nuxt /&gt;); Nuxt 3 - definePageMeta({ layout }), &lt;NuxtLayout /&gt;/&lt;slot /&gt;. Концепция та же.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_009',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Как работают server routes и Nitro API-эндпоинты?',
+    answer:
+      '<p>Server routes - серверные API-эндпоинты из файлов в server/, делающие Nuxt full-stack без отдельного бэкенда.</p><p>Что это: файлы в server/api/ и server/routes/ автоматически становятся серверными эндпоинтами (файловая маршрутизация для API). Выполняются на сервере (Nitro) - доступ к БД, секретам, серверной логике.</p><p>Базовый: server/api/hello.ts → export default defineEventHandler((event) =&gt; ({ message: "Hello" })) доступно на GET /api/hello. defineEventHandler получает event (request/response, контекст); возврат сериализуется в JSON; файлы в server/api/ под префиксом /api/.</p><p>HTTP-методы: server/api/users.get.ts → GET /api/users; users.post.ts → POST; users.delete.ts → DELETE. Суффикс метода в имени файла.</p><p>Динамические параметры: server/api/users/[id].ts → const id = getRouterParam(event, "id"); GET /api/users/42 → { userId: "42" }.</p><p>Работа с запросом (h3): getQuery(event) (query); await readBody(event) (тело POST); getRouterParam(event, "id") (параметр пути); setResponseStatus(event, 201). Nitro использует h3 (HTTP-фреймворк).</p><p>server/routes/: роуты вне /api - sitemap.xml.ts → /sitemap.xml (sitemap, robots.txt, webhooks).</p><p>Зачем full-stack: нет отдельного бэкенда (API в проекте, без Express); серверная логика/секреты (БД, API-ключи, не раскрываются клиенту); BFF (прослойка между фронтом и внешними API - проксирование, агрегация); вызов из фронта useFetch("/api/users").</p><p>Ещё: defineCachedEventHandler (кэшируемый); event.context (общие данные из middleware - авторизованный пользователь).</p><p>Нюансы: server/api/ → /api/*, server/routes/ → без /api; defineEventHandler (возврат → JSON); методы через суффикс; h3-утилиты; серверная сторона (секреты/БД); full-stack; useFetch вызывает.</p><p>Vue 2 → 3 (Nuxt 2 → 3): новинка Nuxt 3 (Nitro); в Nuxt 2 - serverMiddleware (Express-подобный) или отдельный сервер.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_010',
+    topicId: 'topic_nuxt_fundamentals',
+    question: 'Как работает конфигурация Nuxt (nuxt.config, runtimeConfig, app.config)?',
+    answer:
+      '<p>Система конфигурации Nuxt: nuxt.config.ts (сборка/фреймворк), runtimeConfig (env/секреты), app.config.ts (реактивная).</p><p>nuxt.config.ts: defineNuxtConfig({ ssr, modules, routeRules, css, runtimeConfig }). Центральный файл - режимы рендеринга, модули, routeRules, CSS, сборка, плагины. Обрабатывается на build-time.</p><p>runtimeConfig - env и секреты: runtimeConfig: { apiSecret: process.env.API_SECRET (приватный, ТОЛЬКО сервер), public: { apiBase: process.env.API_BASE } (сервер и клиент) }. Значения из переменных окружения в рантайме, не захардкожены. Приватные (верхний уровень) - только сервер (секреты, ключи, токены, не в клиентском бандле); public - сервер и клиент (базовые URL, публичные ключи).</p><p>Доступ: const config = useRuntimeConfig(); config.apiSecret (сервер); config.public.apiBase (везде). Переопределение env (NUXT_API_SECRET, NUXT_PUBLIC_API_BASE) в рантайме - не пересобирать.</p><p>app.config.ts: defineAppConfig({ theme: { primaryColor }, title }). Определяется на сборке, но реактивна, доступна через useAppConfig(). Для публичных не-секретных значений (тема, заголовки, feature-флаги), меняемых реактивно (HMR).</p><p>Разница runtimeConfig vs app.config: runtimeConfig - env (секреты, env-специфичное), переопределяется в рантайме, может быть приватным, не реактивен; app.config - публичные, на сборке, реактивные, НЕ для секретов, нельзя переопределить env. Таблица: определяется (рантайм/сборка); секреты (да/нет); реактивность (нет/да); переопределение env (да/нет).</p><p>Выбор: секреты/env-специфичное (ключи, URL БД) → runtimeConfig приватное; публичные env (API URL) → runtimeConfig.public; публичная реактивная (тема, флаги) → app.config.ts.</p><p>Нюансы: nuxt.config сборка; runtimeConfig env/секреты (приватные vs public); app.config публичная реактивная; секреты только в приватном runtimeConfig (не public/app.config - утекут); useRuntimeConfig()/useAppConfig(); NUXT_* переопределяет без пересборки.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - env/publicRuntimeConfig/privateRuntimeConfig; Nuxt 3 - объединил в runtimeConfig (с public), добавил app.config.ts (реактивная).</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_fundamentals_011',
+    topicId: 'topic_nuxt_fundamentals',
+    question:
+      'Какие встроенные UI-компоненты и утилиты навигации есть в Nuxt (NuxtLink, NuxtLoadingIndicator, transitions)?',
+    answer:
+      '<p>Nuxt даёт встроенные компоненты для навигации и UX: NuxtLink (умные ссылки с prefetch), NuxtLoadingIndicator (прогресс-бар), page/layout transitions.</p><p>NuxtLink: &lt;NuxtLink to="/about"&gt;; &lt;NuxtLink :to="{ name: "posts-id", params: { id: 123 } }"&gt;. Drop-in замена &lt;RouterLink&gt; И &lt;a&gt; - определяет внутренняя или внешняя ссылка, рендерит соответственно (внутренние - client-side навигация, внешние - обычный a). Для всех внутренних ссылок. Принимает to (строка или объект маршрута с name/params/query).</p><p>Smart prefetching: NuxtLink автоматически предзагружает JS-чанки и payload для страниц по ссылке, когда ссылка во вьюпорте (Intersection Observer) - при клике навигация мгновенна. Грузит когда браузер не занят, пропускает при offline/2g. prefetchOn (3.13): prefetch-on="visibility" (по умолчанию), prefetch-on="interaction" (ховер/фокус). Отключение: no-prefetch или :prefetch="false".</p><p>NuxtLoadingIndicator: в app.vue &lt;NuxtLoadingIndicator /&gt;. Прогресс-бар вверху при навигации (визуальная обратная связь). Опции: color, height (px), duration (мс), throttle, estimatedProgress (кастомная функция). Слот для кастомного.</p><p>Page/layout transitions: app: { pageTransition: { name: "fade", mode: "out-in" } (страницы), layoutTransition: { name: "slide", mode: "out-in" } (макеты) } в nuxt.config; per-page definePageMeta({ pageTransition: { name: "rotate" } }). Nuxt использует Vue &lt;Transition&gt; для переходов между страницами и макетами. Нужны CSS-классы (.fade-enter-active). View Transitions API - нативные переходы (app.viewTransition, экспериментально 3.x, стабильно 4).</p><p>Другие: &lt;NuxtPage&gt; (текущая страница, аналог RouterView); &lt;NuxtLayout&gt; (макет); &lt;ClientOnly&gt; (только клиент); &lt;NuxtImg&gt;/&lt;NuxtPicture&gt; (оптимизация изображений, format/loading/sizes/preload); &lt;NuxtRouteAnnouncer&gt; (озвучивание навигации для скринридеров, доступность); &lt;DevOnly&gt; (только dev, tree-shaken); &lt;NuxtClientFallback&gt; (fallback при ошибке рендера на сервере).</p><p>Кастомизация: defineNuxtLink (свой link-компонент с дефолтами).</p><p>Нюансы: NuxtLink (замена RouterLink/a, smart prefetch при видимости); prefetchOn (visibility/interaction, :prefetch="false"); NuxtLoadingIndicator (прогресс-бар в app.vue); page/layout transitions (Vue Transition через app.pageTransition или definePageMeta, CSS-классы); View Transitions API (Nuxt 4); NuxtImg/NuxtRouteAnnouncer/DevOnly.</p><p>Vue 2 → 3 (Nuxt 2 → 3): NuxtLink был (nuxt-link) с prefetch; Nuxt 3 - prefetchOn (3.13), NuxtLoadingIndicator, NuxtRouteAnnouncer, View Transitions, NuxtImg; транзишены на Vue 3 Transition (классы -from).</p>',
+    order: 11,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
   // Nuxt: Загрузка данных
-  // Vue: SSR и гидратация
-  // Vue: Middleware, plugins, modules
+  {
+    id: 'q_nuxt_data_001',
+    topicId: 'topic_nuxt_data',
+    question: 'Почему загрузка данных в Nuxt отличается от обычного Vue?',
+    answer:
+      '<p>Загрузка данных в Nuxt сложнее чистого Vue SPA из-за универсального (изоморфного) выполнения - код работает на сервере и клиенте.</p><p>Ключевое отличие: Nuxt (SSR) выполняет код на сервере И клиенте (изоморфный) - один код запускается дважды: на сервере (генерация HTML) и клиенте (гидратация). В чистом Vue SPA только в браузере (один fetch).</p><p>Проблема двойного запроса: обычный fetch/$fetch в setup при SSR загрузит данные ДВАЖДЫ - на сервере (отрендерить HTML) и на клиенте (при гидратации, setup выполняется повторно). Последствия: лишний запрос (нагрузка на API/сеть), проблемы гидратации, рост времени до интерактивности, непредсказуемость.</p><p>Решение - composables: useFetch и useAsyncData - если запрос на сервере, данные передаются на клиент через payload (сериализуются в HTML). Клиент при гидратации берёт из payload, не делает повторный запрос. Запрос раз (на сервере), результат переезжает в payload.</p><p>Как работает payload: 1) на сервере composable выполняет запрос; 2) результат сериализуется в payload (в HTML); 3) HTML с данными клиенту; 4) клиент при гидратации читает из payload.</p><p>Другие проблемы, которые решают: дедупликация (несколько компонентов - один запрос); блокировка навигации (Suspense под капотом, дождаться данных); состояния загрузки/ошибки (pending/error); гидратация без mismatch (консистентность сервер↔клиент).</p><p>Три инструмента: $fetch (низкоуровневый HTTP-клиент ofetch, сервер и клиент, не предотвращает двойной запрос - для событий); useAsyncData (async-логика с payload); useFetch (обёртка useAsyncData + $fetch для HTTP).</p><p>Нюансы: универсальный код (сервер и клиент); двойной запрос (обычный fetch в setup при SSR); payload-передача; useFetch/useAsyncData для начальных, $fetch для событийных; Suspense под капотом.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - asyncData (страницы), fetch (компоненты) Options API; Nuxt 3 - useFetch/useAsyncData (Composition) с payload.</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_002',
+    topicId: 'topic_nuxt_data',
+    question: 'В чём разница между useFetch, useAsyncData и $fetch?',
+    answer:
+      '<p>Три инструмента загрузки данных Nuxt с разными назначениями.</p><p>$fetch - низкоуровневый HTTP-клиент: обёртка над ofetch, автоимпортируется. Работает на сервере и клиенте, но НЕ предотвращает двойной запрос, не делает дедупликацию/блокировку. Когда: клиентские события (формы, клики, поиск в обработчиках - async function submitForm() { await $fetch("/api/contact", { method: "POST", body }) }); внутри useAsyncData (fetcher); middleware/plugins/server routes. НЕ в setup для начальных данных (двойной запрос при SSR).</p><p>useAsyncData - обёртка для async-логики: useAsyncData("users", () =&gt; $fetch("/api/users")). Принимает ключ + async-функцию (любую). SSR-payload, дедупликация, состояния. Когда: сложные сценарии - несколько источников (Promise.all), SDK, трансформация: useAsyncData("dashboard", async () =&gt; { const [user, stats] = await Promise.all([$fetch("/api/user"), $fetch("/api/stats")]); return { user, stats } }).</p><p>useFetch - шорткат для HTTP: useFetch("/api/users"). Обёртка useAsyncData + $fetch для одного эндпоинта. Вместо ключа URL (ключ авто из URL+опций), опции $fetch и useAsyncData. Даёт SSR-payload, дедупликацию, type inference из API-роутов. Когда: частый случай - просто загрузить с эндпоинта.</p><p>Выбор: начальные с одного эндпоинта → useFetch; начальные со сложной логикой → useAsyncData + $fetch; событийный запрос → $fetch.</p><p>Соотношение: useFetch(url) ≈ useAsyncData(url, () =&gt; $fetch(url)); оба используют $fetch внутри.</p><p>Сравнение: назначение (HTTP/async-логика/эндпоинт); SSR-payload (нет/да/да); дедупликация (нет/да/да); принимает (URL/ключ+функция/URL).</p><p>Нюансы: $fetch для событий/внутри composables, не в setup; useFetch простая загрузка; useAsyncData сложная логика; useFetch = useAsyncData + $fetch; type inference из server/api; частая ошибка - $fetch в setup при SSR.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - asyncData/fetch; Nuxt 3 - $fetch/useAsyncData/useFetch с разделением назначений.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_003',
+    topicId: 'topic_nuxt_data',
+    question: 'Как работает SSR-гидратация данных через payload?',
+    answer:
+      '<p>Механизм передачи данных с сервера на клиент через payload - сердце того, как Nuxt избегает двойной загрузки.</p><p>Проблема: при SSR данные загружаются на сервере (рендеринг HTML); клиент при гидратации должен получить те же данные, иначе повторный запрос или hydration mismatch. Payload - передача серверных данных клиенту вместе с HTML.</p><p>Цикл: 1) сервер - useFetch/useAsyncData выполняет запрос; 2) сериализация - данные в payload, встраиваются в HTML (script с данными); 3) доставка - HTML с payload клиенту; 4) гидратация - клиент десериализует payload и использует без повторного запроса (composable видит, что данные есть).</p><p>Сериализация через devalue: payload от useAsyncData/useFetch сериализуется devalue (не просто JSON.stringify). devalue умнее JSON - сериализует не только базовый JSON, но и сложные типы (RegExp, Date, Map, Set, ref, reactive, shallowRef, NuxtError) и оживляет (revive) на клиенте. Можно свой сериализатор/десериализатор.</p><p>Нюанс server routes: данные из server routes через $fetch/useFetch сериализуются JSON.stringify (не devalue), т.к. через HTTP. Ограничено JSON-примитивами (Date может стать строкой). Данные через HTTP (server route → клиент) - JSON; остающиеся в Nuxt-контексте (useAsyncData с прямой функцией) - devalue (богаче).</p><p>Ключ и payload: каждый useFetch/useAsyncData имеет ключ (useFetch из URL, useAsyncData явный/авто); связывает серверные данные в payload с клиентским обращением. Функция должна вернуть truthy (не undefined/null), чтобы Nuxt не дублировал запрос.</p><p>Нюансы: payload избегает двойного запроса; devalue (Date, Map, Set, ref, RegExp), не только JSON; server routes → JSON (примитивы); ключ связывает, функция truthy; размер payload (pick/transform уменьшают); гидратация без mismatch.</p><p>Vue 2 → 3 (Nuxt 2 → 3): была в Nuxt 2 (__NUXT__); Nuxt 3 - devalue (богаче типы); Nuxt 4 - data стал shallowRef (оптимизация).</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_004',
+    topicId: 'topic_nuxt_data',
+    question: 'Как контролировать выполнение запросов (lazy, server, immediate)?',
+    answer:
+      '<p>Опции useFetch/useAsyncData контролируют где, когда и как выполняется запрос.</p><p>lazy - блокировка навигации: по умолчанию composables блокируют навигацию (Nuxt ждёт запрос через Suspense перед показом страницы) - для критичных данных above-the-fold. lazy: true - не блокировать (навигация сразу, данные в фоне); вручную обрабатывать состояние (status/pending), data может быть null на первом рендере. Когда: некритичные (sidebar, виджеты ниже сгиба). Шорткаты: useLazyFetch/useLazyAsyncData.</p><p>server - сторона выполнения: server: true (по умолчанию) - на сервере (SSR), данные в payload. server: false - только на клиенте (не на сервере), данные не в серверном HTML. Когда: не критично для SEO, ускорить серверный рендер, клиент-специфичные данные. Нюанс: при server: false данные null на сервере → возможен CLS (Cumulative Layout Shift).</p><p>immediate - отложенный старт: immediate: false - не выполняется сразу, а по execute()/refresh(). useAsyncData("products", () =&gt; $fetch("/api/products"), { immediate: false }); &lt;button @click="execute"&gt;. Когда: по клику/действию, status с idle.</p><p>watch - реакция на изменения: useFetch("/api/item", { watch: [id] }) - при изменении id запрос повторяется. Для зависимых от параметров. Реактивный ключ/URL - альтернатива (Nuxt 3.17+ reactive keys авто-инвалидирует).</p><p>Другие: default (значение по умолчанию для data до загрузки, избежать null); dedupe (дедупликация); getCachedData (кэширование).</p><p>Возврат: data (реактивные, Nuxt 4 shallowRef); pending (загрузка); status (idle/pending/success/error); error; refresh/execute.</p><p>Нюансы: lazy не блокирует (null на первом рендере); server: false только клиент (риск CLS); immediate: false старт по execute(); watch перезапрос; default до загрузки; блокировка по умолчанию (Suspense).</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 asyncData блокировал; Nuxt 3 - гранулярный контроль (lazy/server/immediate/watch); reactive keys (3.17+).</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_005',
+    topicId: 'topic_nuxt_data',
+    question: 'Как работают кэширование, дедупликация и ключи данных?',
+    answer:
+      '<p>useFetch/useAsyncData дают встроенное кэширование по ключу, дедупликацию запросов и контроль кэша.</p><p>Ключ - основа кэширования: useAsyncData("users", ...) явный (первый аргумент); useFetch("/api/users") генерируется авто из URL+опций; можно опустить у useAsyncData (по файлу+строке, но лучше явно). Ключ связывает данные между компонентами/запросами; одинаковый ключ = общие данные (кэш).</p><p>Дедупликация: несколько компонентов с одним ключом - Nuxt не делает дублирующих запросов, данные раз и переиспользуются. useFetch("/api/users") в двух компонентах → запрос ОДИН раз, оба получат те же. Избегает лишних запросов.</p><p>dedupe - контроль гонок: когда запрос с тем же ключом уже выполняется и инициируется новый: dedupe: "cancel" (по умолчанию) - отменить предыдущий, начать новый; dedupe: "defer" - переиспользовать существующий (дождаться текущего). Предотвращает лишние вызовы и race conditions.</p><p>Кэширование: данные по ключу кэшируются; при повторном обращении (навигация назад, тот же ключ) возвращаются закэшированные. getCachedData - кастомный контроль: getCachedData(key, nuxtApp) { return nuxtApp.payload.data[key] ?? nuxtApp.static.data[key] }. Для staleTime, инвалидации, переиспользования payload.</p><p>Реактивные ключи (3.17+): ключ computed ref - при изменении Nuxt авто-инвалидирует старые данные, свежий запрос. useAsyncData(computed(() =&gt; `item-${id.value}`), () =&gt; $fetch(...)). Предотвращает устаревшие данные.</p><p>Обновление: refresh() (перезапросить конкретный); refreshNuxtData(key) (инвалидировать глобально после мутации). await $fetch("/api/users", { method: "POST" }); await refreshNuxtData("users").</p><p>Нюансы: ключ - основа кэша/дедупликации (явный лучше); дедупликация (один ключ = один запрос); dedupe cancel/defer (гонки); getCachedData (кастомный кэш); реактивные ключи (авто-инвалидация); refresh/refreshNuxtData.</p><p>Vue 2 → 3 (Nuxt 2 → 3): концепция Nuxt 3 (в Nuxt 2 не было явных ключей); дедупликация, getCachedData, refreshNuxtData, реактивные ключи (3.17+).</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_006',
+    topicId: 'topic_nuxt_data',
+    question: 'Что такое useState и как работает SSR-safe состояние?',
+    answer:
+      '<p>useState - composable Nuxt для разделяемого реактивного состояния, безопасного при SSR.</p><p>Проблема - обычный ref при SSR: разделяемое состояние через ref в модуле (синглтон). Но при SSR опасно: модульный ref общий для всех запросов на сервере (один процесс), состояние утечёт между пользователями (как Pinia-синглтон). Плюс обычный ref в setup не переживает гидратацию (серверное значение не передаётся на клиент).</p><p>Решение: const counter = useState("counter", () =&gt; 0); counter.value++. useState(key, init) - реактивное состояние, привязанное к запросу (не глобальный синглтон), передаваемое через payload на клиент. Ключ - уникальный идентификатор; init - функция начального значения.</p><p>Что даёт: 1) SSR-safe изоляция (привязано к текущему запросу, не разделяется между пользователями); 2) payload-передача (серверное состояние сериализуется в payload, восстанавливается на клиенте - консистентность); 3) разделяемость (один ключ - общее для компонентов, как маленький store); 4) реактивность.</p><p>Аналогия: похож на useAsyncData, но для синхронного состояния (не async). Оба - ключи и payload.</p><p>Применения: простое глобальное состояние между компонентами, SSR-safe (тема, счётчики, флаги, настройки); переживающее навигацию; лёгкая альтернатива Pinia (без store, devtools, actions, плагинов).</p><p>useState vs Pinia: useState - простое разделяемое SSR-safe, минимум церемоний; Pinia - сложное с логикой (actions), геттерами, структурой, devtools. Pinia в Nuxt (@pinia/nuxt) сама SSR-safe; useState - лёгкий встроенный.</p><p>Нюансы: SSR-safe (привязано к запросу, не утекает); payload-передача; ключ разделяет; НЕ модульный ref при SSR (утечка); инициализатор функция (свежее на запрос); лёгкая альтернатива Pinia.</p><p>Vue 2 → 3 (Nuxt 2 → 3): новинка Nuxt 3 (в Nuxt 2 - Vuex или $root); useState как лёгкий SSR-safe примитив (плюс Pinia для сложного).</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_007',
+    topicId: 'topic_nuxt_data',
+    question: 'Как обрабатывать ошибки при загрузке данных?',
+    answer:
+      '<p>Обработка ошибок - критичная часть загрузки: сеть падает, API возвращает ошибки, данные отсутствуют.</p><p>error от composables: const { data, error } = await useFetch("/api/users"); в шаблоне v-if="error" fallback, v-else данные. useFetch/useAsyncData возвращают error (реактивная ссылка или null). Показать fallback UI, не ломая приложение. Всегда обрабатывать pending и error.</p><p>Ошибки $fetch: try { await $fetch("/api/action", { method: "POST" }) } catch (error) { error.statusCode, error.data }. $fetch выбрасывает при не-2xx - оборачивать в try/catch (событийные запросы). Ошибка содержит statusCode, statusMessage, data (тело от сервера).</p><p>createError: throw createError({ statusCode: 404, statusMessage: "Не найдено", fatal: true }). Создаёт структурированную ошибку Nuxt. fatal: true → полноэкранная страница ошибки (error.vue). Без fatal - локально.</p><p>showError: showError({ statusCode: 500, statusMessage: "Ошибка" }) - программно вызвать страницу ошибки.</p><p>error.vue: в корне, defineProps({ error }); &lt;h1&gt;{{ error.statusCode }}&lt;/h1&gt;; clearError({ redirect: "/" }). Кастомная полноэкранная страница (для фатальных). clearError - очистить и редиректнуть.</p><p>Уровни: 1) локальная (error от composable) - fallback в компоненте, приложение работает (некритичные, виджет); 2) фатальная (createError с fatal/showError) - полноэкранная страница (критичные, 404); 3) onErrorCaptured (error boundary); 4) глобальный (app:error, vue:error для логирования).</p><p>SSR-специфика: ошибки на сервере влияют на HTTP-ответ (статус-код); createError со statusCode устанавливает статус (404 должен быть 404, для SEO).</p><p>Нюансы: error от composables (fallback, всегда обрабатывать); $fetch бросает (try/catch, statusCode/data); createError + fatal (страница); showError/clearError; error.vue; SSR-статусы; уровни.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - error(), error.vue; Nuxt 3 - createError/showError/clearError, error от composables, onErrorCaptured.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_008',
+    topicId: 'topic_nuxt_data',
+    question: 'Как трансформировать и оптимизировать загружаемые данные (transform, pick)?',
+    answer:
+      '<p>transform и pick обрабатывают и уменьшают данные до попадания в компонент/payload, оптимизируя размер и структуру.</p><p>pick - выбрать нужные поля: useFetch("/api/users/1", { pick: ["firstName", "lastName"] }) - только эти поля верхнего уровня, остальное отброшено. API часто возвращает большие объекты, нужна часть. Эффект: хотя полный ответ получен, в payload попадают только выбранные → меньше payload → меньше HTML, быстрее гидратация.</p><p>transform - преобразовать: useFetch("/api/users", { transform(users) { return users.map(user =&gt; ({ name: user.name, price: user.price })) } }). Функция обработки после загрузки, до попадания в компонент/payload. Может: реструктурировать, отфильтровать, вычислить производные, отбросить лишнее. Эффект: чистые данные в компоненте (без обработки в шаблоне); уменьшенный payload.</p><p>Почему оптимизация: при SSR данные в payload (в HTML); большие данные = раздутый HTML = медленнее гидратация. pick/transform уменьшают до сериализации → меньше передаётся. Важно для больших списков/объектов.</p><p>Комбинирование: pick - простой выбор полей верхнего уровня; transform - сложная обработка (вложенное, вычисления).</p><p>Где обрабатывать: transform/pick - до payload (на сервере при SSR), уменьшает передаваемое (предпочтительно); computed в компоненте - после получения (на клиенте), НЕ уменьшает payload (для производных отображаемых). Цель уменьшить payload → transform/pick; производное для отображения → computed.</p><p>Другие: default (до загрузки); server: false (не на сервере); lazy (не блокировать); shallowRef для data (Nuxt 4, меньше оверхеда).</p><p>Нюансы: pick (поля верхнего уровня); transform (реструктуризация); оба уменьшают payload (до сериализации); transform/pick vs computed (до/после передачи); для больших данных критично; чистые данные в компоненте.</p><p>Vue 2 → 3 (Nuxt 2 → 3): опции Nuxt 3; в Nuxt 2 обработка вручную в asyncData; Nuxt 3 - декларативные опции с оптимизацией payload.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_009',
+    topicId: 'topic_nuxt_data',
+    question: 'Как обновлять данные и работать с параллельными/зависимыми запросами?',
+    answer:
+      '<p>Паттерны загрузки: параллельные, зависимые запросы, обновление после мутаций, periodic refresh.</p><p>Параллельные (независимые): useAsyncData("dashboard", async () =&gt; { const [users, posts, stats] = await Promise.all([$fetch("/api/users"), $fetch("/api/posts"), $fetch("/api/stats")]); return { users, posts, stats } }). Не зависят друг от друга - параллельно через Promise.all (не последовательно), все стартуют одновременно. Обернуть в useAsyncData для SSR-payload.</p><p>Зависимые (один от другого): const { data: user } = await useFetch(`/api/users/${id}`); const { data: posts } = await useFetch(`/api/users/${user.value.id}/posts`, { watch: [user] }). Последовательно с реактивной зависимостью (watch или реактивный ключ/URL). Реактивный URL: useFetch(() =&gt; `/api/posts/${user.value?.id}`).</p><p>После мутаций: async function createUser(data) { await $fetch("/api/users", { method: "POST", body: data }); await refreshNuxtData("users") }. После мутации (POST/PUT/DELETE): refresh() (конкретный composable) или refreshNuxtData(key) (глобально). Синхронизирует UI с сервером.</p><p>Polling: const { data, refresh } = await useFetch("/api/live-data"); const timer = setInterval(() =&gt; refresh(), 5000); onScopeDispose(() =&gt; clearInterval(timer)). refresh() в интервале; обязательно очищать таймер (иначе утечка).</p><p>Реактивные параметры: useFetch(() =&gt; `/api/items/${route.params.id}`, { watch: [() =&gt; route.params.id] }) - перезапрос при смене параметра (решает переиспользование компонента).</p><p>Оптимистичные обновления: обновить UI сразу, затем мутация; при ошибке откатить. Отзывчивость.</p><p>Инкапсуляция: composables/useUsers.ts - export function useUsers() { return useAsyncData("users", () =&gt; $fetch("/api/users")) }. Переиспользование, чистые компоненты, с Pinia для state-heavy.</p><p>Нюансы: параллельные Promise.all; зависимые с watch/реактивным ключом; после мутаций refresh/refreshNuxtData; polling + очистка таймера; реактивные параметры; инкапсуляция в composables.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 asyncData раз (без refresh/watch); Nuxt 3 - refresh/refreshNuxtData/watch/реактивные ключи; composables + Pinia.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_data_010',
+    topicId: 'topic_nuxt_data',
+    question: 'Как загружать данные из своих server routes и внешних API?',
+    answer:
+      '<p>Обращение к своим server routes (Nitro) и внешним API, паттерн BFF, проксирование, безопасность.</p><p>Свои server routes: server/api/users.ts (defineEventHandler(() =&gt; getUsersFromDB())); в компоненте useFetch("/api/users"). Обращается к своему эндпоинту. Type inference: Nuxt выводит типы из API-роутов автоматически (universal type-safety) - data типизирован по возвращаемому типу.</p><p>Внешние API: useFetch("https://api.external.com/data") напрямую, или через свой server route (BFF, предпочтительно для секретов).</p><p>BFF (Backend-for-Frontend): server/api/products.ts проксирует внешний API, скрывая ключ - const config = useRuntimeConfig(); return await $fetch("https://external-api.com/products", { headers: { Authorization: `Bearer ${config.apiSecret}` } }). Компонент обращается к СВОЕМУ эндпоинту (useFetch("/api/products"), ключ не раскрыт). Зачем: внешний API требует секретный ключ; напрямую с клиента - ключ раскроется в браузере; проксирование держит ключ на сервере (приватный runtimeConfig). Также: агрегация API, трансформация, кэширование, обход CORS.</p><p>API-клиент (централизация): composables/useApi.ts - return $fetch.create({ baseURL: config.public.apiBase, headers: {} }). Централизовать конфигурацию (baseURL, заголовки, токены) - единообразие, DRY. Интегрировать в Pinia для state-heavy.</p><p>Безопасность: секреты только на сервере (server routes, приватный runtimeConfig), не в клиентском коде; Zero-Trust SSR sanitization (санитизировать ввод, SSR-инъекции); CORS для своих API (routeRules cors: true или заголовки).</p><p>Кэширование: defineCachedEventHandler (Nitro-кэш ответа); routeRules (swr/isr на уровне маршрутов).</p><p>Нюансы: свои routes (useFetch с type inference); BFF (проксировать внешние, скрыть секреты, агрегация, CORS); секреты на сервере; API-клиент ($fetch.create); type-safety из server/api; кэширование.</p><p>Vue 2 → 3 (Nuxt 2 → 3): server routes/BFF - Nuxt 3 (Nitro); в Nuxt 2 отдельный сервер/serverMiddleware; Nuxt 3 - full-stack data flow с type-safety.</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  // Nuxt: SSR и гидратация
+  {
+    id: 'q_nuxt_rendering_ssr_001',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как устроен жизненный цикл SSR-запроса в Nuxt?',
+    answer:
+      '<p>Полный путь SSR-запроса - от запроса браузера до интерактивной страницы.</p><p>Цикл:</p><p>1) Запрос браузера: пользователь запрашивает URL, приходит на Nitro-сервер.</p><p>2) Серверный рендеринг: Nitro сопоставляет маршрут, запускает компонент. setup выполняется на сервере (состояние, useFetch/useAsyncData на сервере). DOM-хуки НЕ выполняются (onMounted/onUpdated/onUnmounted, нет DOM). Vue рендерит в HTML-строку.</p><p>3) Payload: загруженные данные сериализуются в payload (devalue), встраиваются в HTML (клиент не запросит заново).</p><p>4) Доставка HTML: готовый HTML (контент + payload + мета-теги) браузеру. Пользователь сразу видит контент (быстрый FCP), краулеры видят HTML (SEO).</p><p>5) Загрузка JS и гидратация: браузер загружает бандл; гидратация - Vue оживляет серверный HTML (реактивность, обработчики) без повторного рендера (переиспользует серверный DOM); данные из payload; onMounted вызывается (первый раз, на клиенте).</p><p>6) Интерактивность: приложение интерактивно, дальше как SPA (клиентская навигация).</p><p>Что где: только сервер (рендер в HTML, onServerPrefetch, серверные middleware); сервер и клиент universal (setup, useFetch/useAsyncData - запрос на сервере, данные из payload на клиенте, created); только клиент (onMounted, браузерные API, гидратация, интерактивность).</p><p>Последующая навигация: после первой SSR-загрузки - клиентская (SPA), NuxtLink/navigateTo без перезагрузки. SSR только для первого запроса (или перезагрузка/прямая ссылка).</p><p>Нюансы: SSR только первый запрос (дальше SPA); setup на сервере и клиенте, onMounted только клиент; payload - мост данных; гидратация - оживление, не повторный рендер; быстрый FCP + SEO; Nitro - движок.</p><p>Vue 2 → 3 (Nuxt 2 → 3): схож; Nuxt 3 - Nitro, useFetch/useAsyncData с payload, лучшая гидратация (частичная/ленивая 3.5).</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_002',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Что такое hydration mismatch и как его избежать?',
+    answer:
+      '<p>Hydration mismatch - расхождение между серверным и клиентским рендерингом, вызывающее ошибки. Частая коварная проблема SSR.</p><p>Что это: гидратация - Vue берёт серверный HTML и активирует реактивностью/обработчиками, ожидая совпадения клиентского рендера с серверным. Mismatch - когда HTML при гидратации отличается от серверного. Vue логирует «Hydration completed but contains mismatches».</p><p>Почему серьёзно (не просто warning): рост времени до интерактивности (Vue перерендерит всё дерево, теряется выгода SSR); плохой UX (мелькание, CLS); сломанная интерактивность (обработчики не привязываются, кнопки/формы не работают); рассинхронизация состояния; SEO-проблемы (индексируют не то).</p><p>Причины: 1) браузерные API в SSR (window/localStorage нет на сервере - разойдётся/упадёт); 2) недетерминированные значения (Math.random(), Date.now() - разное на сервере/клиенте); 3) разные данные сервер/клиент (загрузка только на клиенте - использовать useFetch/useAsyncData); 4) невалидный HTML (div в p, вложенные a - браузер авто-исправляет, расходится).</p><p>Решения: 1) &lt;ClientOnly&gt; для браузерного контента; 2) консистентные данные (useFetch/useAsyncData); 3) избегать побочных эффектов в setup - браузерный код в onMounted (только клиент): onMounted(() =&gt; time.value = new Date().toISOString()); 4) стабильные начальные значения (const id = ref("loading"); onMounted(() =&gt; id.value = crypto.randomUUID())); 5) валидный HTML (@nuxtjs/html-validator); 6) data-allow-mismatch/&lt;NuxtTime&gt; для неизбежных (timestamps).</p><p>Отладка: View Source (не Inspect) - серверный HTML (что видит краулер); консоль (предупреждения); @nuxtjs/html-validator (невалидный HTML).</p><p>Нюансы: mismatch серьёзно (re-render, интерактивность, SEO); причины (браузерные API, недетерминированные, разные данные, невалидный HTML); решения (ClientOnly, onMounted, useFetch, стабильные значения); data-allow-mismatch для неизбежных; View Source vs Inspect.</p><p>Vue 2 → 3: в обеих; Vue 3/Nuxt 3 - лучшие предупреждения, data-allow-mismatch, useId.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_003',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как работает компонент <ClientOnly>?',
+    answer:
+      '<p>&lt;ClientOnly&gt; - встроенный компонент Nuxt для рендеринга контента только на клиенте, пропуская серверный рендеринг.</p><p>Что делает: &lt;ClientOnly&gt;&lt;GoogleMap /&gt;&lt;/ClientOnly&gt; - оборачивает контент, который должен рендериться только в браузере, полностью пропуская серверный рендеринг. Nuxt не рендерит на сервере, только на клиенте после гидратации.</p><p>Когда: браузер-зависимые библиотеки (карты Google Maps, чарты, редакторы, требующие window/document/DOM); контент, вызывающий hydration mismatch (заведомо различается сервер/клиент - window, время, случайность); клиент-специфичный UI.</p><p>Слот #fallback: &lt;ClientOnly&gt;&lt;p&gt;Время: {{ currentTime }}&lt;/p&gt;&lt;template #fallback&gt;&lt;p&gt;Загрузка...&lt;/p&gt;&lt;/template&gt;&lt;/ClientOnly&gt;. Показывается на сервере (и до гидратации), пока основной контент не отрендерился. Улучшает UX (не пустое место, снижает CLS).</p><p>С Teleport: &lt;ClientOnly&gt;&lt;Teleport to="#modal-root"&gt;&lt;div class="modal"&gt;&lt;/Teleport&gt;&lt;/ClientOnly&gt; - Teleport к элементу, которого нет на сервере.</p><p>Осторожность: SEO - контент в ClientOnly не в серверном HTML → краулеры не видят (не индексируется), не оборачивать SEO-важное; начальная производительность - появляется после JS/гидратации (задержка, CLS), #fallback смягчает; осознанно (не затычка для всех mismatch, исправлять причину).</p><p>Альтернативы: onMounted (логика на клиенте); .client.vue суффикс (компонент только на клиенте); import.meta.client (условный код); data-allow-mismatch/&lt;NuxtTime&gt; (неизбежные расхождения без пропуска SSR).</p><p>Нюансы: пропускает SSR, только клиент; #fallback (плейсхолдер, UX, CLS); для браузерных библиотек и mismatch; SEO-компромисс (не индексируется); осознанно; альтернативы.</p><p>Vue 2 → 3 (Nuxt 2 → 3): был в Nuxt 2 (&lt;client-only&gt;, ранее &lt;no-ssr&gt;); Nuxt 3 - &lt;ClientOnly&gt; с #fallback. Концепция та же.</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_004',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как работают import.meta.server/client и .server/.client файлы?',
+    answer:
+      '<p>Nuxt даёт условное выполнение кода по окружению (сервер/клиент): флаги import.meta.server/client и суффиксы .server/.client.</p><p>import.meta.server/client - флаги: if (import.meta.server) { только на сервере }; if (import.meta.client) { только на клиенте }. import.meta.server - true на сервере; import.meta.client - true на клиенте. Условно выполнять код в universal-контексте (setup, plugins, composables).</p><p>Применения: защита браузерных API (if (import.meta.client) { window.innerWidth } - не упадёт на сервере); серверная логика (if (import.meta.server) { серверные ресурсы }). Избегает ошибок и mismatch (браузерный код не выполнится на сервере).</p><p>.server.vue/.client.vue - компоненты: MyComponent.client.vue → только на КЛИЕНТЕ (аналог ClientOnly на уровне файла, браузер-зависимые); MyComponent.server.vue → только на СЕРВЕРЕ (server component, не отправляет JS, статичный контент).</p><p>.server.ts/.client.ts - код: plugins/analytics.client.ts → плагин только на клиенте; logger.server.ts → только на сервере. Суффикс определяет, где выполняется (аналитика - только клиент).</p><p>Что где: сервер (серверные ресурсы, нет window/document/localStorage); клиент (браузерные API, нет серверных ресурсов).</p><p>Выбор: import.meta.client/server (условная логика, несколько строк); .client/.server суффикс (целый компонент/файл); &lt;ClientOnly&gt; (разметка в шаблоне); onMounted (логика после монтирования).</p><p>Пример: useWindowWidth() { const width = ref(0); if (import.meta.client) { width.value = window.innerWidth; window.addEventListener("resize", ...) }; return width }.</p><p>Нюансы: import.meta.server/client (логика, защита браузерных API); .client.vue/.server.vue (компоненты); .client.ts/.server.ts (код/плагины); import.meta.client перед window; выбор инструмента; tree-shaking (код под import.meta.server вырезается из клиентского бандла).</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - process.server/client; Nuxt 3 - import.meta.server/client (стандартнее, tree-shaking); .client/.server суффиксы, server components - Nuxt 3.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_005',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как управлять SEO и мета-тегами через useHead и useSeoMeta?',
+    answer:
+      '<p>SEO - главная причина SSR. Nuxt даёт useHead и useSeoMeta для управления &lt;head&gt; (title, мета-теги, Open Graph) с серверным рендерингом.</p><p>Почему SEO требует SSR: краулеры (Google) видят серверный HTML (View Source). Если мета-теги/контент только на клиенте (SPA) - краулер видит пустоту до JS. SSR отдаёт готовые мета-теги в HTML → краулеры сразу видят → индексация.</p><p>useHead: useHead({ title: "Страница", meta: [{ name: "description", content: "Описание" }, { property: "og:title", content: "..." }], link: [{ rel: "canonical", href: "..." }] }). Низкоуровневый API для любых &lt;head&gt; элементов (title, meta, link, script, style). Работает с SSR (теги в серверном HTML).</p><p>useSeoMeta: useSeoMeta({ title, description, ogTitle, ogDescription, ogImage, twitterCard: "summary_large_image" }). Типизированный API для SEO-мета-тегов - автокомплит и типы для всех SEO/Open Graph/Twitter полей. Предпочтительнее useHead (типобезопасность, меньше ошибок в property).</p><p>Реактивность (критично): передавать ref/функцию, НЕ .value. useHead({ title: () =&gt; route.meta.title }) (функция, обновляется); useHead({ title: pageTitle }) (ref, реактивно); useHead({ title: pageTitle.value }) - ТЕРЯЕТ реактивность (статичное). Nuxt (Unhead) синхронизирует при навигации.</p><p>Глобальные (nuxt.config): app: { head: { titleTemplate: "%s - Сайт", meta: [{ name: "viewport", content: "..." }] } }. Дефолты; per-page через useHead/useSeoMeta.</p><p>Unhead - движок: синхронизация SSR↔клиент, реактивность, дедупликация. Требует инициализации (встроено); без SSR useHead тихо не работает.</p><p>Отладка: View Source (не Inspect) - что видит краулер (серверный HTML с тегами); если нет - SSR не работает/client-only. URL Inspection в Search Console. Ошибка: ssr: false ломает SEO; данные в onMounted не видны.</p><p>Нюансы: useHead (любые head); useSeoMeta (типизированный, предпочтительно); реактивность (ref/функция, не .value); SSR-рендеринг тегов; Unhead; View Source; ssr: false ломает SEO.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - head() Options API; Nuxt 3 - useHead/useSeoMeta (Unhead), реактивнее, типизированнее.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_006',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Что такое payload и как передаются данные с сервера на клиент?',
+    answer:
+      '<p>Payload как механизм передачи всего состояния сервер→клиент, не только данных.</p><p>Что это (системно): payload - сериализованное состояние приложения, передаваемое с сервера на клиент вместе с HTML. Позволяет клиенту продолжить с того же состояния без повторной работы. Встраивается в HTML (script-блок), десериализуется при гидратации.</p><p>Что попадает: данные useAsyncData/useFetch (серверные запросы); useState (SSR-safe состояние); другое состояние Nuxt (конфигурация, контекст). Не только данные запросов, а всё для консистентной гидратации.</p><p>Зачем: 1) избежать повторной загрузки (данные с сервера передаются, клиент не запрашивает заново); 2) консистентность сервер↔клиент (гидратация с теми же данными, нет mismatch); 3) сохранение состояния (useState переживает переход).</p><p>Сериализация devalue: умнее JSON.stringify - Date, Map, Set, RegExp, ref, reactive, NuxtError, оживляет на клиенте. Свой сериализатор через definePayloadPlugin.</p><p>Доступ: const nuxtApp = useNuxtApp(); nuxtApp.payload (весь); nuxtApp.payload.data (данные composables); nuxtApp.static.data (SSG). Для кастомного кэширования (getCachedData).</p><p>Режимы: SSR - payload на сервере на каждый запрос, в HTML; SSG - на сборке, в статические HTML (замораживается); payloadExtraction - извлечь в отдельный файл (SSG-оптимизация).</p><p>Размер: большой payload = раздутый HTML = медленнее загрузка/парсинг. Уменьшать: pick/transform (только нужные), не класть лишнее в useState/payload.</p><p>Payload plugins: definePayloadPlugin(() =&gt; { definePayloadReducer(...); definePayloadReviver(...) }) - для типов, которые devalue не поддерживает.</p><p>Нюансы: payload - всё состояние (данные + useState + контекст); избегает повторной загрузки + консистентность; devalue (Date, Map, ref); useNuxtApp().payload; размер уменьшать; SSG (замораживается), payloadExtraction; payload plugins.</p><p>Vue 2 → 3 (Nuxt 2 → 3): был в Nuxt 2 (window.__NUXT__); Nuxt 3 - devalue, payload plugins, payloadExtraction.</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_007',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как писать universal (изоморфный) код для SSR?',
+    answer:
+      '<p>Universal-код - код, работающий на сервере и клиенте. Ключевой навык для SSR.</p><p>Что это: в SSR код (setup, plugins, composables) выполняется дважды - на сервере и клиенте, должен работать в обоих. Проблема: разные API - на сервере нет window/document/localStorage, на клиенте нет серверных ресурсов.</p><p>Принципы:</p><p>1) Не обращаться к браузерным API в universal-контексте: ПЛОХО const width = window.innerWidth (упадёт на сервере); ХОРОШО onMounted(() =&gt; width.value = window.innerWidth) или if (import.meta.client). Браузерные API (window, document, localStorage, navigator) - в onMounted/import.meta.client.</p><p>2) Не использовать недетерминированные значения в рендере: Math.random(), new Date() - mismatch. Инициализировать стабильно, менять в onMounted.</p><p>3) Консистентные данные: useFetch/useAsyncData/useState - payload даёт одинаковые данные сервер↔клиент. Не грузить по-разному.</p><p>4) SSR-safe состояние: useState вместо модульного ref (изоляция между запросами); useCookie для куки.</p><p>5) onMounted только клиент: логика с DOM/браузером - в onMounted.</p><p>Инструменты: import.meta.server/client (условная логика); onMounted (только клиент); &lt;ClientOnly&gt; (разметка); .client/.server файлы; useFetch/useAsyncData/useState/useCookie (SSR-совместимые); VueUse (SSR-safe).</p><p>Ошибки: браузерный API в setup (падение/mismatch); данные в onMounted для SSR-контента (на сервере пусто, теряется SEO); модульный ref для глобального (утечка между запросами); недетерминированные в шаблоне (mismatch); localStorage в universal-коде (падение).</p><p>Паттерн: useTheme() { const theme = useState("theme", () =&gt; "light"); if (import.meta.client) { const saved = localStorage.getItem("theme"); if (saved) theme.value = saved }; return theme }.</p><p>Нюансы: код дважды (сервер + клиент); браузерные API только onMounted/import.meta.client; недетерминированные избегать; консистентные данные (useFetch/useState); SSR-safe состояние; инструменты.</p><p>Vue 2 → 3 (Nuxt 2 → 3): принципы одинаковы; Nuxt 3 - import.meta.client (вместо process.client), useState/useCookie, ClientOnly, .client/.server; VueUse SSR-aware.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_008',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как работает useCookie и управление состоянием между запросами?',
+    answer:
+      '<p>useCookie - SSR-совместимый composable для работы с куками, доступными на сервере и клиенте. Куки хранят состояние, переживающее запросы.</p><p>Проблема: куки нужно читать/писать и на сервере (SSR - узнать тему/авторизацию до рендера), и на клиенте. Прямой document.cookie - только клиент (нет document на сервере). Нужен SSR-совместимый способ.</p><p>useCookie: const theme = useCookie("theme"); theme.value = "dark" (установить, реактивно); theme.value (прочитать). Реактивная ссылка на куку, работающая на сервере и клиенте. На сервере - из заголовков запроса, пишет в заголовки ответа; на клиенте - document.cookie. Реактивно - изменение .value обновляет куку.</p><p>Опции: useCookie("token", { maxAge: 86400, secure: true, httpOnly: false, sameSite: "lax", default: () =&gt; "guest" }). Стандартные: maxAge/expires, secure, httpOnly, sameSite, domain, path, default.</p><p>Применения: авторизация (токен/сессия доступен на сервере для SSR-проверки); настройки (тема, локаль для рендера правильного варианта, избежать mismatch/мелькания); состояние, переживающее запросы (в отличие от useState, куки персистентны).</p><p>Куки vs useState: useState - состояние в рамках запроса/сессии (не персистентно, сбрасывается при перезагрузке); useCookie - персистентное, в браузере, доступно на сервере при каждом запросе (переживает перезагрузки). Часто вместе.</p><p>SSR-нюанс: читая куку на сервере, рендерим правильный вариант (тема из куки) сразу в HTML → нет мелькания/mismatch (в отличие от localStorage только на клиенте - flash/mismatch). Для SSR-контента от настроек куки предпочтительнее localStorage.</p><p>Безопасность: httpOnly: true (недоступна JS, только сервер - для токенов, защита от XSS); secure/sameSite (HTTPS, CSRF); не хранить секреты в JS-доступных куках.</p><p>Нюансы: useCookie SSR-safe; реактивно; персистентно (в отличие от useState); куки vs localStorage (куки на сервере, нет mismatch); httpOnly/secure/sameSite; авторизация/настройки.</p><p>Vue 2 → 3 (Nuxt 2 → 3): новинка Nuxt 3; в Nuxt 2 сложнее (req/res, ручное чтение, cookie-universal).</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_009',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как работает SSR-специфика жизненного цикла и серверный контекст?',
+    answer:
+      '<p>Nuxt-специфика SSR: серверный контекст (event, useRequestEvent), onServerPrefetch, серверные утилиты.</p><p>Что на сервере: setup, created - да; onServerPrefetch - да (SSR-хук); onMounted/onUpdated/onUnmounted - НЕТ (нет DOM).</p><p>Серверный контекст: const event = useRequestEvent() - доступ к Nitro event (запрос/ответ) на сервере. if (import.meta.server &amp;&amp; event) { const headers = event.node.req.headers; установить заголовки/статус ответа }. useRequestHeaders([\\"cookie\\", \\"authorization\\"]) - заголовки входящего запроса (для проксирования авторизации): const { data } = await useFetch(\\"/api/protected\\", { headers }).</p><p>onServerPrefetch: onServerPrefetch(async () =&gt; { data.value = await fetchData() }) - на сервере ДО рендеринга, ждёт async. Для данных в серверный HTML. Обычно useAsyncData/useFetch (под капотом), onServerPrefetch - низкоуровневая опция.</p><p>Серверные утилиты: useRequestURL() (полный URL, SSR-safe); useRequestHeaders() (заголовки); useRequestEvent() (Nitro event); useResponseHeader()/установка заголовков; setResponseStatus(event, code) (HTTP-статус, 404).</p><p>Серверные middleware/плагины: server/middleware/ (на каждый серверный запрос до рендера); .server.ts плагины (только на сервере). Серверная логика (авторизация, логирование).</p><p>Паттерн - проброс авторизации: const headers = useRequestHeaders([\\"cookie\\"]); const { data } = await useFetch(\\"/api/user\\", { headers }). При SSR запрос идёт с сервера (не из браузера) - нужно вручную пробросить куки/авторизацию, иначе бэкенд не узнает пользователя.</p><p>Нюансы: useRequestEvent() (Nitro event); useRequestHeaders() (проброс авторизации при SSR); onServerPrefetch (данные на сервере); setResponseStatus (404); проброс заголовков; серверные composables только на сервере (import.meta.server).</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - req/res через context/asyncData(context); Nuxt 3 - useRequestEvent/useRequestHeaders/useRequestURL (на Nitro event); onServerPrefetch - Vue 3 хук.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_010',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как работает SEO глубже: structured data, sitemap, canonical, Open Graph?',
+    answer:
+      '<p>Продвинутые аспекты SEO: structured data, sitemap, canonical, Open Graph/Twitter Cards, robots.</p><p>Open Graph/Twitter Cards: useSeoMeta({ ogTitle, ogDescription, ogImage, ogUrl, ogType: "article", twitterCard: "summary_large_image", twitterTitle, twitterImage }). Open Graph (og:*) - вид при шеринге в соцсетях (Facebook, LinkedIn) - заголовок, описание, картинка. Twitter Cards (twitter:*) - для Twitter/X. useSeoMeta типизированно для всех.</p><p>Canonical: useHead({ link: [{ rel: "canonical", href: "..." }] }) - основной URL, если контент по нескольким URL (параметры, дубли). Предотвращает проблемы дублированного контента.</p><p>Structured Data (JSON-LD): useHead({ script: [{ type: "application/ld+json", innerHTML: JSON.stringify({ "@context": "https://schema.org", "@type": "Article", headline, author }) }] }). Размеченные данные для краулеров (статья, продукт, событие, FAQ) - rich results (расширенные сниппеты: рейтинги, цены, FAQ). Улучшает видимость.</p><p>Sitemap: sitemap.xml - список URL для краулеров (обнаружение). @nuxtjs/sitemap (из роутов) или server route (server/routes/sitemap.xml.ts).</p><p>robots: robots.txt (какие страницы краулить); мета-robots useSeoMeta({ robots: "noindex, nofollow" }) (per-page); @nuxtjs/robots.</p><p>Модули: @nuxtjs/seo (мета-модуль - sitemap, robots, schema.org, og-image); nuxt-og-image (динамическая генерация OG-изображений).</p><p>Динамические SEO: const { data: article } = await useFetch(`/api/articles/${slug}`); useSeoMeta({ title: () =&gt; article.value?.title, description: () =&gt; article.value?.excerpt }). На основе данных (реактивно), загружать через useFetch (SSR - теги в HTML).</p><p>Нюансы: Open Graph/Twitter (превью, useSeoMeta); canonical (основной URL, дубли); structured data JSON-LD (rich results); sitemap/robots (обнаружение/краулинг, модули); @nuxtjs/seo (комплексное); динамические SEO (useFetch + реактивные теги); SSR обязателен (теги в серверном HTML, View Source).</p><p>Vue 2 → 3 (Nuxt 2 → 3): универсальны; Nuxt 3 - useSeoMeta, @nuxtjs/seo, nuxt-og-image, Unhead; Nuxt 2 - head(), vue-meta.</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_011',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как оптимизировать SSR-производительность и гидратацию?',
+    answer:
+      '<p>Оптимизации SSR в Nuxt-контексте: ленивая гидратация, острова, streaming, кэширование, минимизация payload.</p><p>Узкое место - гидратация: не серверный рендер, а гидратация на клиенте (выполнить весь JS, оживить дерево). До завершения не интерактивно (TTI).</p><p>Оптимизации гидратации: 1) ленивая гидратация (Vue 3.5) - откладывать некритичные до нужды (on visible/idle/interaction); 2) островная архитектура (.server.vue server components - рендерятся на сервере, не отправляют JS, не гидратируются, для статичного контента; гидратируются только интерактивные острова); 3) кэширование (ISR/SWR в routeRules, defineCachedEventHandler, CDN-кэш - не рендерить на каждый запрос); 4) минимизация payload (pick/transform, не класть лишнее - меньше HTML, быстрее гидратация); 5) code splitting/ленивая загрузка (меньше начального JS).</p><p>Оптимизации рендеринга: 6) правильный режим per-route (routeRules - SSG для статики, SSR для динамики, SPA для не-SEO); 7) streaming SSR (HTML чанками, контент выше сгиба сразу); 8) оптимизация данных (Promise.all, lazy для некритичного).</p><p>Core Web Vitals: LCP (SSR даёт контент в начальном HTML, preload hero-изображений); CLS (избегать сдвигов, осторожно с ssr: false/client-only - flash); INP (быстрая гидратация для отзывчивости).</p><p>Изображения: @nuxt/image (форматы, размеры, lazy); preload критичных, lazy для below-fold.</p><p>Нюансы: гидратация - узкое место (ленивая, острова); server components (.server.vue) не отправляют JS; кэширование (ISR/SWR, CDN); минимизация payload; per-route режим; Core Web Vitals (LCP/CLS/INP); @nuxt/image.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 3 - гибридный рендеринг, ISR/SWR, server components, ленивая гидратация (3.5), streaming, Nitro-кэш; Nuxt 2 ограничен (один режим).</p>',
+    order: 11,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_rendering_ssr_012',
+    topicId: 'topic_nuxt_rendering_ssr',
+    question: 'Как отлаживать SSR-проблемы и hydration mismatch?',
+    answer:
+      '<p>Методология отладки SSR-проблем: mismatch, отсутствие мета-тегов, разное поведение сервер/клиент.</p><p>Ключевой инструмент - View Source vs Inspect: View Source (правый клик → Просмотр кода) - исходный серверный HTML, что отправил сервер (что видит краулер Google первым); Inspect Element (F12 → Elements) - живой DOM после JS (пост-гидратация). Различие: если контент/теги в Inspect, но НЕТ в View Source - рендерятся только на клиенте (SSR не работает), краулер не видит.</p><p>Отладка mismatch: 1) консольные предупреждения («Hydration completed but contains mismatches», dev); 2) найти причину (браузерные API в setup - window/Date/Math.random; разные данные сервер/клиент - useFetch vs onMounted; невалидный HTML - @nuxtjs/html-validator; множественные корни); 3) сузить (комментировать/изолировать, &lt;ClientOnly&gt; вокруг подозрительного - если mismatch исчез, причина там).</p><p>Отладка SEO: View Source (есть ли теги в серверном HTML? нет → SSR не работает/client-only - данные в onMounted, ssr: false); URL Inspection в Search Console (как Google рендерит); реактивность (ref/функция, не .value); ssr: false глобально ломает SEO.</p><p>Инструменты Nuxt: Nuxt DevTools (мета-теги, payload, компоненты); @nuxtjs/html-validator (невалидный HTML); консоль сервера (серверные ошибки в терминале).</p><p>Разное поведение: import.meta.server/client (где выполняется); серверные логи (терминал) vs браузерная консоль; universal-код не зависит от окружения непреднамеренно.</p><p>Частые причины: mismatch; ssr: false где не надо; данные в onMounted вместо useFetch (не в серверном HTML); HTML-минификаторы (Cloudflare Auto Minify - mismatch, отключить); устаревший кэш браузера (старый JS, очистить).</p><p>Методология: симптом → View Source → консоль → изолировать → причина → исправить (onMounted/import.meta.client/useFetch/валидный HTML) → проверить.</p><p>Нюансы: View Source vs Inspect (краулер vs DOM); консольные предупреждения; @nuxtjs/html-validator; URL Inspection; серверные логи vs консоль; минификаторы/кэш; изоляция.</p><p>Vue 2 → 3 (Nuxt 2 → 3): схожа; Nuxt 3 - DevTools, улучшенные предупреждения, html-validator, data-allow-mismatch.</p>',
+    order: 12,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  // Nuxt: Middleware, plugins, modules
+  {
+    id: 'q_nuxt_advanced_001',
+    topicId: 'topic_nuxt_advanced',
+    question: 'Как работает route middleware в Nuxt?',
+    answer:
+      '<p>Route middleware - функции, выполняемые перед навигацией к маршруту (авторизация, редиректы, проверки). Nuxt-эквивалент navigation guards Vue Router с расширениями.</p><p>Что это: функции перед переходом к маршруту - разрешить навигацию, перенаправить или отменить. Обёртка над navigation guards с SSR и конвенциями.</p><p>Три вида: 1) Anonymous (inline) - в компоненте через definePageMeta({ middleware: defineNuxtRouteMiddleware((to, from) =&gt; {}) }), для специфичной странице логики; 2) Named - middleware/auth.ts (export default defineNuxtRouteMiddleware((to, from) =&gt; { if (!auth.value.isAuthenticated) return navigateTo("/login") })), применяется definePageMeta({ middleware: "auth" }) по имени, автозагружается (async import), переиспользуемая; 3) Global - middleware/analytics.global.ts (суффикс .global.ts), на КАЖДУЮ навигацию автоматически (без указания), для аналитики/глобальной авторизации.</p><p>Сигнатура: defineNuxtRouteMiddleware((to, from) =&gt; {}) - to (целевой маршрут RouteLocationNormalized), from (текущий). Как guards.</p><p>Управление навигацией: return navigateTo("/path") (редирект); return abortNavigation()/abortNavigation(error) (отмена, опц. ошибка); throw createError({}) (страница ошибки); ничего не вернуть (разрешить). Пример: if (to.params.id === "1") return abortNavigation(createError({ statusCode: 404 })).</p><p>Порядок: сначала global (по именам файлов/order), затем named/anonymous (по указанию в definePageMeta).</p><p>SSR-нюанс: выполняется на сервере (SSR первой загрузки) и клиенте (навигация). Пропустить (import.meta.server/client, nuxtApp.isHydrating). Не вызывать useRoute() внутри - использовать to (иначе предупреждение).</p><p>addRouteMiddleware: в плагине - addRouteMiddleware("global-check", (to) =&gt; {}, { global: true }).</p><p>Нюансы: три вида (anonymous/named/global); (to, from); navigateTo/abortNavigation, createError; порядок (global, затем named); SSR (сервер и клиент); не useRoute() внутри; addRouteMiddleware.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - функция с context ({ store, redirect }); Nuxt 3 - defineNuxtRouteMiddleware((to, from)) с navigateTo/abortNavigation. Nuxt 2 - middleware не выполнялся на клиенте при initial load (static), Nuxt 3 исправил.</p>',
+    order: 1,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_002',
+    topicId: 'topic_nuxt_advanced',
+    question: 'В чём разница между route middleware и server middleware?',
+    answer:
+      '<p>Nuxt имеет два типа middleware - route (навигационный, клиент+сервер) и server (Nitro, только сервер). Их путают.</p><p>Route middleware (middleware/): выполняется перед навигацией к маршруту, связан с роутингом Vue. На сервере (SSR) и клиенте (навигация) - universal. Назначение: авторизация страниц, редиректы, проверки перед показом. defineNuxtRouteMiddleware((to, from)) - контекст навигации.</p><p>Server middleware (server/middleware/): server/middleware/log.ts → defineEventHandler((event) =&gt; { console.log(getRequestURL(event)) }). На сервере (Nitro) на КАЖДЫЙ HTTP-запрос, ДО обработки маршрута/API. Только на сервере (Nitro, не Vue). Назначение: серверная логика - логирование, авторизация запроса, модификация заголовков, проверка токенов API. defineEventHandler((event)) - контекст HTTP. Не блокирует навигацию по-Vue - на уровне HTTP.</p><p>Различия: каталог (middleware/ vs server/middleware/); где (сервер+клиент vs только сервер); когда (перед навигацией vs на каждый HTTP-запрос); контекст ((to, from) vs (event)); функция (defineNuxtRouteMiddleware vs defineEventHandler); для чего (авторизация страниц/редиректы vs логирование/серверная авторизация API); управление (navigateTo/abortNavigation vs заголовки/статус/event.context).</p><p>Когда: route - клиентская навигация и SSR-страницы (защита страниц, редиректы в UI); server - серверная обработка HTTP (все запросы, API, авторизация API, логирование).</p><p>Пример: защита /admin от неавторизованных (редирект /login) → route middleware; проверка API-токена для /api/*, логирование → server middleware.</p><p>event.context: server middleware кладёт данные (event.context.user = getUserFromToken(event)), доступные в server/api/* далее.</p><p>Нюансы: route (навигация, сервер+клиент, (to, from)); server (HTTP, только сервер, (event)); route - защита страниц (Vue); server - обработка запросов (Nitro/HTTP); event.context передаёт данные; не путать (разные каталоги/назначения).</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - route middleware и serverMiddleware (конфиг, Express); Nuxt 3 - route (middleware/) и server (server/middleware/, defineEventHandler через Nitro). Структурированнее.</p>',
+    order: 2,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_003',
+    topicId: 'topic_nuxt_advanced',
+    question: 'Как работают плагины в Nuxt (defineNuxtPlugin)?',
+    answer:
+      '<p>Плагины - код при инициализации Nuxt-приложения (Vue-плагины, директивы, инъекция хелперов, настройка библиотек).</p><p>Что это: файлы в plugins/, выполняемые при создании Vue-приложения. Автозагружаются (верхний уровень и index в подпапках). Для: Vue-плагины (библиотеки), директивы, инъекция хелперов, клиенты (API, i18n).</p><p>defineNuxtPlugin: plugins/hello.ts → export default defineNuxtPlugin((nuxtApp) =&gt; {}). Получает nuxtApp (доступ к vueApp, хукам, контексту).</p><p>Инъекция (provide): return { provide: { yen(value) { return Number(value).toLocaleString() + "円" } } }. Доступ: const { $yen } = useNuxtApp(); $yen(1000); в шаблоне {{ $yen(price) }}. provide - хелпер доступен везде через $name.</p><p>Vue-плагины/директивы: nuxtApp.vueApp.use(SomeVuePlugin); nuxtApp.vueApp.directive("focus", { mounted(el) { el.focus() } }). nuxtApp.vueApp - доступ к Vue-приложению для .use() и .directive().</p><p>Окружение: plugins/analytics.client.ts (только клиент); logger.server.ts (только сервер); universal.ts (оба). Суффикс определяет где.</p><p>Объектный синтаксис: defineNuxtPlugin({ name, enforce: "pre" (до других, pre/default/post), dependsOn: ["other"], parallel: true, async setup(nuxtApp) {}, hooks: { "app:created"() {} } }). Контроль: name, enforce (порядок), dependsOn (зависимости), parallel, order, hooks.</p><p>Порядок: по имени файла (алфавитно, префиксы 01.first.ts, 02.second.ts); enforce/dependsOn/order. Нюанс: на клиенте middleware может грузиться до плагинов при гидратации.</p><p>Применения: UI-библиотеки, i18n, аналитика; инъекция API-клиента, хелперов ($api, $dayjs); директивы; обработчики ошибок (vue:error).</p><p>Нюансы: defineNuxtPlugin (инициализация, автозагрузка); provide ($name); nuxtApp.vueApp (Vue-плагины/директивы); .client/.server; объектный синтаксис (контроль); порядок (имя файла, parallel).</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - inject("name"), context, конфиг plugins: []; Nuxt 3 - defineNuxtPlugin((nuxtApp)) с provide, автозагрузка, объектный синтаксис.</p>',
+    order: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_004',
+    topicId: 'topic_nuxt_advanced',
+    question: 'Что такое модули Nuxt и как работает defineNuxtModule?',
+    answer:
+      '<p>Модули - расширения фреймворка на этапе сборки: интеграции, автонастройки, генерация кода.</p><p>Что это: расширяют ядро Nuxt на этапе сборки/инициализации (build-time, не рантайм). Могут: добавлять плагины, компоненты, composables, серверные роуты, изменять конфигурацию, интегрировать библиотеки, генерировать код. Экосистема: @nuxt/image, @nuxt/content, @pinia/nuxt, @nuxtjs/tailwindcss, @nuxtjs/i18n (312+).</p><p>Отличие от плагина: плагин - рантайм-код при запуске приложения (регистрирует в Vue); модуль - build-time при сборке (настраивает проект, добавляет плагины/компоненты/роуты). Модуль может добавлять плагины. Модуль - уровень фреймворка/сборки; плагин - приложения/рантайма.</p><p>Подключение: modules: ["@pinia/nuxt", "@nuxt/image", "@nuxtjs/tailwindcss"] в nuxt.config. Nuxt выполняет при сборке.</p><p>defineNuxtModule: modules/my-module.ts → import { defineNuxtModule, addPlugin, createResolver } from "@nuxt/kit"; defineNuxtModule({ meta: { name, configKey: "myModule" }, defaults: { enabled: true }, setup(options, nuxt) { const resolver = createResolver(import.meta.url); addPlugin(resolver.resolve("./runtime/plugin")) } }). Из @nuxt/kit. meta (имя, configKey - ключ опций); defaults (дефолтные опции); setup(options, nuxt) - логика при сборке.</p><p>Утилиты @nuxt/kit: addPlugin; addComponent (авто-импорт); addImports (composable/утилита); addServerHandler (серверный роут); addRouteMiddleware; extendPages (маршруты); addVitePlugin/addWebpackPlugin; createResolver (пути); installModule.</p><p>Локальные (modules/): файлы в modules/ - локальные модули, автоподключаются (без modules-массива). Проектная build-логика.</p><p>Опции (configKey): modules: ["my-module"], myModule: { enabled: false } - опции по configKey.</p><p>Хуки: модуль в setup подписывается на хуки Nuxt (build/app) для интеграции в сборку.</p><p>Нюансы: модуль - build-time расширение (плагины/компоненты/роуты); модуль vs плагин (сборка vs рантайм); defineNuxtModule (@nuxt/kit, meta/defaults/setup); утилиты (addPlugin/addComponent/addImports/addServerHandler); modules/ (локальные); configKey; экосистема.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - modules и buildModules; Nuxt 3 - унифицировал modules, @nuxt/kit, defineNuxtModule типобезопасный; Nuxt 4.3 - ленивая загрузка build-плагинов.</p>',
+    order: 4,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_005',
+    topicId: 'topic_nuxt_advanced',
+    question: 'Как работают хуки Nuxt (app, build, nitro hooks)?',
+    answer:
+      '<p>Хуки Nuxt - точки расширения жизненного цикла приложения, сборки и сервера. В плагинах и модулях.</p><p>Что это: именованные события в жизненном цикле Nuxt, на которые подписываются для выполнения кода в нужный момент (сборка, инициализация, серверные события). Механизм расширения - плагины и модули подписываются.</p><p>Категории:</p><p>1) App hooks (рантайм): nuxtApp.hook("app:created", () =&gt; {}); nuxtApp.hook("page:start", () =&gt; {}); nuxtApp.hook("vue:error", (err) =&gt; {}). Хуки: app:created, app:mounted, page:start/page:finish (навигация), vue:error, app:error. Через nuxtApp.hook(name, fn) в плагинах.</p><p>2) Build hooks (сборка): в модуле nuxt.hook("build:before", () =&gt; {}); nuxt.hook("pages:extend", (pages) =&gt; {}); nuxt.hook("components:extend", (components) =&gt; {}). Хуки: build:before/build:done, pages:extend (маршруты), components:extend, imports:extend, nitro:config. Через nuxt.hook(name, fn) в модуле.</p><p>3) Nitro hooks (серверный движок): nuxt.hook("nitro:config", (nitroConfig) =&gt; {}); nitroApp.hooks.hook("render:response", ...). Хуки: nitro:config, nitro:build:before, render:html, render:response.</p><p>Где используются: плагины (app hooks - навигация, ошибки, инициализация); модули (build hooks - страницы, компоненты, авто-импорты, и nitro hooks); nuxt.config (hooks ключ - hooks: { "pages:extend"(pages) {} }).</p><p>Применения: pages:extend (добавить/изменить маршруты программно); components:extend (регистрация компонентов); nitro:config (серверный движок); vue:error/app:error (глобальная обработка ошибок); app:mounted (после монтирования).</p><p>Хуки vs middleware/плагины: хуки - вклиниться в процессы Nuxt (сборка, рендеринг, навигация) низкоуровнево; плагины - инициализация рантайма; middleware - навигация. Хуки для расширения фреймворка (модули).</p><p>Нюансы: хуки (app/build/nitro); app hooks (nuxtApp.hook, рантайм) в плагинах; build hooks (nuxt.hook, сборка) в модулях; nitro hooks; nuxt.config hooks; pages:extend/components:extend; для модулей/расширения.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - хуки (nuxt.hook build), менее развита; Nuxt 3 - app hooks, nitro hooks, больше точек, типобезопасность. Основа модульной архитектуры.</p>',
+    order: 5,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_006',
+    topicId: 'topic_nuxt_advanced',
+    question:
+      'Как работают server routes и Nitro глубже (defineEventHandler, кэширование, storage)?',
+    answer:
+      '<p>Продвинутые возможности Nitro: defineCachedEventHandler, nitro storage, middleware-контекст.</p><p>Server routes (напоминание): server/api/ → эндпоинты через defineEventHandler; методы через суффиксы (.get/.post); h3-утилиты (getQuery/readBody/getRouterParam).</p><p>Кэширование - defineCachedEventHandler: export default defineCachedEventHandler(async (event) =&gt; await expensiveOperation(), { maxAge: 3600, name: "data", getKey: (event) =&gt; "static-key" }). Кэширует результат (Nitro-кэш). Дорогие операции (БД, внешние API) не на каждый запрос. Опции: maxAge (TTL), getKey (ключ), name, swr.</p><p>Nitro storage: const storage = useStorage("redis"); await storage.setItem("key", value); await storage.getItem("key"). Унифицированный интерфейс к хранилищу (память, файлы, Redis, KV), абстрагирует бэкенд. Для кэша, сессий, временных данных. Настройка nitro.storage.</p><p>cachedFunction: defineCachedFunction(async (id) =&gt; await db.users.findById(id), { maxAge: 60 }) - кэш произвольных функций.</p><p>h3-утилиты: getQuery(event) (?param); readBody(event) (тело); getRouterParam(event, "id") (/:id); getRequestHeaders(event); getCookie(event, "name"); setCookie(event, "name", "value"); setResponseStatus(event, 201); setResponseHeaders(event, {}).</p><p>event.context: server/middleware кладёт event.context.user = getUser(event); server/api читает event.context.user. Общие данные между middleware и routes (авторизованный пользователь).</p><p>server/routes/: sitemap.xml.ts → /sitemap.xml (без /api).</p><p>Ошибки: throw createError({ statusCode: 400, statusMessage: "Bad Request" }) - правильный HTTP-статус.</p><p>WebSocket/стриминг: Nitro поддерживает WebSocket-хендлеры, стриминг (sendStream).</p><p>Нюансы: defineCachedEventHandler (кэш эндпоинта); useStorage (key-value, память/файлы/Redis); defineCachedFunction (кэш функций); h3-утилиты; event.context (middleware↔routes); createError (статусы); Nitro (кэш, storage, WebSocket, стриминг).</p><p>Vue 2 → 3 (Nuxt 2 → 3): server routes/Nitro - Nuxt 3; продвинутое (defineCachedEventHandler, useStorage) - Nitro; в Nuxt 2 примитивнее (serverMiddleware).</p>',
+    order: 6,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_007',
+    topicId: 'topic_nuxt_advanced',
+    question: 'Что такое Nuxt Layers и как работает extends?',
+    answer:
+      '<p>Nuxt Layers - механизм переиспользования и расширения конфигурации, компонентов, структуры между проектами через наследование.</p><p>Что это: возможность расширять Nuxt-проект другим Nuxt-проектом (или частью) - наследовать конфигурацию, компоненты, composables, страницы, плагины, структуру. По сути наследование целых Nuxt-приложений: базовый слой + расширяющий проект.</p><p>extends: extends: ["../base-layer" (локальный), "@my-org/nuxt-base" (npm), "github:my-org/nuxt-layer" (git)] в nuxt.config. Массив слоёв для наследования (папка, npm-пакет, git). Проект наследует всё из слоя, может переопределять.</p><p>Что наследуется: компоненты (components/); composables (авто-импорт); конфигурация (nuxt.config сливается); страницы (pages/, можно переопределить); layouts, плагины, middleware, server routes; app.config (сливается).</p><p>Приоритет: расширяющий проект имеет приоритет над слоем - переопределяет компонент/страницу/конфиг (специфичное побеждает). Несколько слоёв - порядок в extends определяет приоритет.</p><p>Применения: 1) дизайн-система/UI-кит (базовый слой с компонентами/стилями для нескольких проектов); 2) монорепо (общая база - конфиг, утилиты, компоненты); 3) шаблоны проектов (стартовый слой); 4) мультитенантность/white-label (базовый + переопределения на клиента - брендинг); 5) разделение крупного приложения по доменам.</p><p>Layers vs Modules: module - build-time через код (defineNuxtModule, @nuxt/kit), добавляет функциональность программно; layer - через структуру Nuxt-проекта (наследование каталогов/конфига), переиспользование целых частей декларативно. Layer - «наследовать проект»; module - «добавить функциональность кодом».</p><p>Layers vs FSD: Layers - переиспользование между проектами (наследование), не внутренняя организация одного; для внутренней - FSD/модульные паттерны. Дополняют на уровне конфигурации/базы.</p><p>Нюансы: Layers (наследование Nuxt-проектов); extends (локальные/npm/git); наследование + переопределение (приоритет); применения (дизайн-системы, монорепо, white-label); layer vs module (структура vs код); сливаемая конфигурация.</p><p>Vue 2 → 3 (Nuxt 2 → 3): новинка Nuxt 3 (в Nuxt 2 не было наследования проектов); переиспользование на уровне фреймворка.</p>',
+    order: 7,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_008',
+    topicId: 'topic_nuxt_advanced',
+    question: 'Как работает runtimeConfig глубже и управление окружениями?',
+    answer:
+      '<p>Углубление runtimeConfig: переопределение через env, приватные/публичные, типизация, паттерны окружений.</p><p>Напоминание: значения из окружения, переопределяемые в рантайме. Приватные (сервер) vs public (везде). useRuntimeConfig().</p><p>Переопределение через env: runtimeConfig: { apiSecret: "", public: { apiBase: "/api" } }; .env: NUXT_API_SECRET=secret123, NUXT_PUBLIC_API_BASE=https://api.example.com. Соглашение: NUXT_ + путь в UPPER_SNAKE_CASE (apiSecret → NUXT_API_SECRET; public.apiBase → NUXT_PUBLIC_API_BASE). Переопределяются в рантайме - не пересобирать при смене окружения. Один билд, разные env.</p><p>Приватные vs публичные: приватные (верхний уровень) - только сервер, не в клиентском бандле (секреты - ключи, токены БД); public - сервер и клиент, в клиентском бандле (не-секретные - публичные URL, аналитика). Критично: секрет в public = утечка в браузер. Секреты только в приватном.</p><p>Доступ: const config = useRuntimeConfig(); сервер - config.apiSecret и config.public.apiBase; клиент - только config.public.apiBase (apiSecret undefined). В server routes - useRuntimeConfig(event).</p><p>Типизация: типы из дефолтов; или расширить declare module "nuxt/schema" { interface RuntimeConfig { apiSecret: string }; interface PublicRuntimeConfig { apiBase: string } }.</p><p>Паттерны окружений: .env файлы (.env, .env.production); не хардкодить окружение-специфичное (runtimeConfig + env); CI/CD (env в пайплайне, не коммитить секреты); один билд, разные env (собрать раз, деплой с разными env).</p><p>runtimeConfig vs app.config: runtimeConfig - env/секреты, рантайм-переопределение, приватное/публичное; app.config - публичное, реактивное, на сборке.</p><p>Безопасность: секреты только в приватном; не коммитить .env (gitignore); проверять, что секрет не в клиентском бандле (не public/app.config); useRuntimeConfig(event) в server routes.</p><p>Нюансы: env-переопределение (NUXT_*, UPPER_SNAKE_CASE, рантайм); приватные (сервер) vs public (везде), секреты в приватном; один билд, разные env; типизация; useRuntimeConfig(event); безопасность.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - env/publicRuntimeConfig/privateRuntimeConfig; Nuxt 3 - runtimeConfig с public, NUXT_* переопределение, типизация.</p>',
+    order: 8,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_009',
+    topicId: 'topic_nuxt_advanced',
+    question: 'Как реализовать авторизацию в Nuxt (полный паттерн)?',
+    answer:
+      '<p>Сквозной паттерн авторизации: middleware, useCookie, server routes, SSR-контекст, состояние.</p><p>Компоненты: состояние пользователя (useState, SSR-safe); токен/сессия (useCookie/httpOnly, на сервере); защита страниц (route middleware); защита API (server middleware); проброс при SSR (useRequestHeaders).</p><p>1) Состояние (composable): composables/useAuth.ts - const user = useState("user", () =&gt; null); const isAuthenticated = computed(() =&gt; !!user.value); async login(credentials) { const data = await $fetch("/api/auth/login", { method: "POST", body: credentials }); user.value = data.user }; logout() { await $fetch("/api/auth/logout", { method: "POST" }); user.value = null }.</p><p>2) Токен в httpOnly куке: server/api/auth/login.post.ts - const user = await verifyCredentials(email, password); const token = generateToken(user); setCookie(event, "token", token, { httpOnly: true (защита от XSS), secure: true, sameSite: "lax", maxAge: 604800 }); return { user }. httpOnly (не localStorage) - защита от XSS-кражи.</p><p>3) Защита страниц (route middleware): middleware/auth.ts - const { isAuthenticated } = useAuth(); if (!isAuthenticated.value) return navigateTo("/login"). definePageMeta({ middleware: "auth" }).</p><p>4) Защита API (server middleware): server/middleware/auth.ts - const token = getCookie(event, "token"); if (token) event.context.user = verifyToken(token). server/api/protected.ts - if (!event.context.user) throw createError({ statusCode: 401 }); return getProtectedData().</p><p>5) Восстановление при SSR: const { data } = await useFetch("/api/auth/me", { headers: useRequestHeaders(["cookie"]) }). При SSR запрос с сервера - пробросить куку, чтобы сервер узнал пользователя.</p><p>Поток: логин → сервер ставит httpOnly куку + пользователь → useState; навигация → route middleware проверяет isAuthenticated → редирект; API → server middleware читает куку → event.context.user → роуты проверяют; SSR → проброс куки → восстановление.</p><p>Готовые: @sidebase/nuxt-auth, nuxt-auth-utils (OAuth, сессии).</p><p>Нюансы: useState (состояние); httpOnly кука (XSS, не localStorage); route middleware (страницы); server middleware (API, event.context.user); проброс куки (useRequestHeaders, SSR); готовые модули; интеграция всего.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 2 - @nuxtjs/auth; Nuxt 3 - useState/useCookie/defineEventHandler/server middleware/useRequestHeaders, @sidebase/nuxt-auth. Гибче благодаря Nitro.</p>',
+    order: 9,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
+  {
+    id: 'q_nuxt_advanced_010',
+    topicId: 'topic_nuxt_advanced',
+    question: 'Какие продвинутые паттерны и лучшие практики есть в Nuxt?',
+    answer:
+      '<p>Свод продвинутых паттернов и best practices: архитектура, производительность, безопасность, организация.</p><p>Архитектура: composables для логики (инкапсуляция бизнес-логики/загрузки, переиспользование); Nuxt Layers (переиспользование между проектами - дизайн-системы, монорепо); модули (расширение фреймворка для build-логики); BFF через server routes (прослойка, скрытие секретов, агрегация); модульная организация (границы, публичные фасады).</p><p>Производительность: правильный режим per-route (routeRules - SSG/SSR/ISR/SPA под задачу); ленивая гидратация, острова (server components); кэширование (ISR/SWR, defineCachedEventHandler, getCachedData); минимизация payload (pick/transform, не лишнее в useState); code splitting (ленивые компоненты/роуты); @nuxt/image.</p><p>Безопасность: секреты только на сервере (приватный runtimeConfig, server routes); httpOnly куки для токенов (XSS); валидация/санитизация ввода в server routes; CORS/заголовки; не доверять клиенту (авторизация на сервере).</p><p>SEO: SSR/SSG для SEO-контента (не ssr: false глобально); useSeoMeta/useHead (мета-теги, OG, structured data); @nuxtjs/seo (sitemap, robots, schema).</p><p>Организация: конвенции Nuxt (структура каталогов); auto-imports (чистый код); TypeScript (type inference server routes, runtimeConfig типы); #imports/#server алиасы (чистые пути, Nuxt 4).</p><p>SSR-корректность: universal-код (без браузерных API в setup, консистентные данные); избегать hydration mismatch (ClientOnly, onMounted, стабильные значения); SSR-safe состояние (useState/useCookie, не модульный ref).</p><p>Данные: правильный инструмент (useFetch/useAsyncData/$fetch под сценарий); обработка ошибок (error, createError); обновление после мутаций (refresh/refreshNuxtData).</p><p>Экосистема: модули (i18n, auth, content, image - не изобретать); Nuxt DevTools (отладка); деплой (Nitro presets, любая платформа).</p><p>Нюансы: архитектура (composables, Layers, модули, BFF, границы); производительность (per-route, ленивая гидратация/острова, кэширование, payload); безопасность (секреты на сервере, httpOnly, валидация); SEO (SSR/SSG, useSeoMeta); организация (конвенции, auto-imports, TS); SSR-корректность (universal, mismatch, SSR-safe состояние); экосистема.</p><p>Vue 2 → 3 (Nuxt 2 → 3): Nuxt 3 - гибридный рендеринг, Nitro, composables, Layers, @nuxt/kit, TS, экосистема. Сдвиг: composables вместо mixins/Vuex, per-route рендеринг, server routes вместо бэкенда, useState/useCookie для SSR. Современный full-stack Vue-фреймворк.</p>',
+    order: 10,
+    createdAt: NOW,
+    updatedAt: NOW,
+  },
 ];
