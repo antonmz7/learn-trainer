@@ -88,11 +88,13 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
   const currentIndex = useTrainerStore((state) => state.currentIndex);
   const isAnswerVisible = useTrainerStore((state) => state.isAnswerVisible);
   const isShuffled = useTrainerStore((state) => state.isShuffled);
+  const isCompleted = useTrainerStore((state) => state.isCompleted);
   const toggleAnswer = useTrainerStore((state) => state.toggleAnswer);
   const goNext = useTrainerStore((state) => state.goNext);
   const goPrevious = useTrainerStore((state) => state.goPrevious);
   const shuffle = useTrainerStore((state) => state.shuffle);
   const restart = useTrainerStore((state) => state.restart);
+  const finish = useTrainerStore((state) => state.finish);
   const canGoNext = useTrainerStore((state) => state.canGoNext());
   const canGoPrevious = useTrainerStore((state) => state.canGoPrevious());
   const isFinished = useTrainerStore((state) => state.isFinished());
@@ -141,9 +143,8 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
     );
   }
 
-  // Экран завершения показываем, когда пользователь на последнем вопросе
-  // И открыл ответ — это сигнал, что он действительно его проработал
-  if (isFinished && isAnswerVisible) {
+  // Экран завершения — только по явному действию пользователя (кнопка "Завершить")
+  if (isCompleted) {
     return (
       <TrainerCompleted totalQuestions={questions.length} onRestart={restart} onShuffle={shuffle} />
     );
@@ -151,6 +152,9 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
 
   const currentQuestion = questions[realQuestionIndex];
 
+  // Защита от рассинхронизации: после перехода с длинной темы на короткую
+  // может быть кадр, когда currentIndex ещё указывает на несуществующий
+  // вопрос (стор сбрасывается в следующем тике useEffect).
   if (!currentQuestion) {
     return (
       <div className="flex flex-col gap-4">
@@ -174,6 +178,7 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
       <TrainerNavigator
         onPrevious={goPrevious}
         onNext={goNext}
+        onFinish={finish}
         canGoPrevious={canGoPrevious}
         canGoNext={canGoNext}
         isLastQuestion={isFinished}

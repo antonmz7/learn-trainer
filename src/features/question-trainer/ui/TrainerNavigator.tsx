@@ -1,10 +1,11 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 
 interface TrainerNavigatorProps {
   onPrevious: () => void;
   onNext: () => void;
+  onFinish: () => void;
   canGoPrevious: boolean;
   canGoNext: boolean;
   isLastQuestion: boolean;
@@ -13,6 +14,7 @@ interface TrainerNavigatorProps {
 export function TrainerNavigator({
   onPrevious,
   onNext,
+  onFinish,
   canGoPrevious,
   canGoNext,
   isLastQuestion,
@@ -24,13 +26,16 @@ export function TrainerNavigator({
         Предыдущий
       </Button>
 
-      {!isLastQuestion ? (
+      {isLastQuestion ? (
+        <Button type="button" onClick={onFinish}>
+          <CheckCircle2 className="size-4" aria-hidden="true" />
+          Завершить
+        </Button>
+      ) : (
         <Button type="button" onClick={onNext} disabled={!canGoNext}>
           Следующий
           <ChevronRight className="size-4" aria-hidden="true" />
         </Button>
-      ) : (
-        <span className="text-brand-600 text-sm font-medium">Это последний вопрос</span>
       )}
     </div>
   );

@@ -17,6 +17,7 @@ describe('useTrainerStore', () => {
       expect(state.currentIndex).toBe(0);
       expect(state.isAnswerVisible).toBe(false);
       expect(state.isShuffled).toBe(false);
+      expect(state.isCompleted).toBe(false);
       expect(state.questionOrder).toEqual([0, 1, 2, 3, 4]);
     });
 
@@ -178,6 +179,34 @@ describe('useTrainerStore', () => {
       expect(state.totalQuestions).toBe(5);
       expect(state.isShuffled).toBe(false);
       expect(state.questionOrder).toEqual([0, 1, 2, 3, 4]);
+    });
+  });
+
+  describe('finish', () => {
+    beforeEach(() => {
+      useTrainerStore.getState().initialize(3);
+    });
+
+    it('устанавливает isCompleted в true', () => {
+      expect(useTrainerStore.getState().isCompleted).toBe(false);
+      useTrainerStore.getState().finish();
+      expect(useTrainerStore.getState().isCompleted).toBe(true);
+    });
+
+    it('restart сбрасывает isCompleted обратно в false', () => {
+      useTrainerStore.getState().finish();
+      expect(useTrainerStore.getState().isCompleted).toBe(true);
+
+      useTrainerStore.getState().restart();
+      expect(useTrainerStore.getState().isCompleted).toBe(false);
+    });
+
+    it('shuffle сбрасывает isCompleted обратно в false', () => {
+      useTrainerStore.getState().finish();
+      expect(useTrainerStore.getState().isCompleted).toBe(true);
+
+      useTrainerStore.getState().shuffle();
+      expect(useTrainerStore.getState().isCompleted).toBe(false);
     });
   });
 });

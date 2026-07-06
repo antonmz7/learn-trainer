@@ -5,6 +5,7 @@ interface TrainerState {
   isAnswerVisible: boolean;
   totalQuestions: number;
   isShuffled: boolean;
+  isCompleted: boolean;
   /**
    * Порядок индексов вопросов для отображения.
    * При обычном режиме это [0, 1, 2, ...n-1].
@@ -29,6 +30,7 @@ interface TrainerState {
   shuffle: () => void;
   restart: () => void;
   reset: () => void;
+  finish: () => void;
 }
 
 const INITIAL_STATE = {
@@ -36,6 +38,7 @@ const INITIAL_STATE = {
   isAnswerVisible: false,
   totalQuestions: 0,
   isShuffled: false,
+  isCompleted: false,
   questionOrder: [] as number[],
 };
 
@@ -105,6 +108,7 @@ export const useTrainerStore = create<TrainerState>((set, get) => ({
       currentIndex: 0,
       isAnswerVisible: false,
       isShuffled: true,
+      isCompleted: false,
     });
   },
 
@@ -118,4 +122,6 @@ export const useTrainerStore = create<TrainerState>((set, get) => ({
   },
 
   reset: () => set(INITIAL_STATE),
+
+  finish: () => set({ isCompleted: true }),
 }));
