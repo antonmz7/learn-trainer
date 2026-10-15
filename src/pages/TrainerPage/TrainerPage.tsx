@@ -11,6 +11,7 @@ import {
   TrainerCompleted,
   TrainerNavigator,
   TrainerProgress,
+  TrainerSidebar,
   TrainerToolbar,
   useTrainerStore,
 } from '@/features/question-trainer';
@@ -92,6 +93,8 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
   const toggleAnswer = useTrainerStore((state) => state.toggleAnswer);
   const goNext = useTrainerStore((state) => state.goNext);
   const goPrevious = useTrainerStore((state) => state.goPrevious);
+  const goTo = useTrainerStore((state) => state.goTo);
+  const questionOrder = useTrainerStore((state) => state.questionOrder);
   const shuffle = useTrainerStore((state) => state.shuffle);
   const restart = useTrainerStore((state) => state.restart);
   const finish = useTrainerStore((state) => state.finish);
@@ -143,19 +146,12 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
     );
   }
 
-  // Экран завершения — только по явному действию пользователя (кнопка "Завершить")
-  if (isCompleted) {
-    return (
-      <TrainerCompleted totalQuestions={questions.length} onRestart={restart} onShuffle={shuffle} />
-    );
-  }
-
   const currentQuestion = questions[realQuestionIndex];
 
   // Защита от рассинхронизации: после перехода с длинной темы на короткую
   // может быть кадр, когда currentIndex ещё указывает на несуществующий
   // вопрос (стор сбрасывается в следующем тике useEffect).
-  if (!currentQuestion) {
+  if (!currentQuestion || questionOrder.length !== questions.length) {
     return (
       <div className="flex flex-col gap-4">
         <Skeleton className="h-8 w-32" />
@@ -165,24 +161,44 @@ function TrainerContent({ questions, isLoading, isError, error }: TrainerContent
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <TrainerToolbar isShuffled={isShuffled} onShuffle={shuffle} />
-      <TrainerProgress current={currentIndex} total={questions.length} />
-
-      <QuestionCard
-        question={currentQuestion}
-        isAnswerVisible={isAnswerVisible}
-        onToggleAnswer={toggleAnswer}
+    <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+      {/* На мобильных список уходит под карточку, на десктопе — прилипает слева */}
+      <TrainerSidebar
+        questions={questions}
+        questionOrder={questionOrder}
+        currentIndex={currentIndex}
+        onSelect={goTo}
+        className="order-last max-h-80 lg:sticky lg:top-6 lg:order-first lg:max-h-[calc(100vh-3rem)]"
       />
 
-      <TrainerNavigator
-        onPrevious={goPrevious}
-        onNext={goNext}
-        onFinish={finish}
-        canGoPrevious={canGoPrevious}
-        canGoNext={canGoNext}
-        isLastQuestion={isFinished}
-      />
+      {/* Экран завершения — только по явному действию пользователя (кнопка "Завершить") */}
+      {isCompleted ? (
+        <TrainerCompleted
+          totalQuestions={questions.length}
+          onRestart={restart}
+          onShuffle={shuffle}
+        />
+      ) : (
+        <div className="flex min-w-0 flex-col gap-6">
+          <TrainerToolbar isShuffled={isShuffled} onShuffle={shuffle} />
+          <TrainerProgress current={currentIndex} total={questions.length} />
+
+          <QuestionCard
+            question={currentQuestion}
+            isAnswerVisible={isAnswerVisible}
+            onToggleAnswer={toggleAnswer}
+          />
+
+          <TrainerNavigator
+            onPrevious={goPrevious}
+            onNext={goNext}
+            onFinish={finish}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
+            isLastQuestion={isFinished}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -24,6 +24,8 @@ interface TrainerState {
   initialize: (totalQuestions: number) => void;
   goNext: () => void;
   goPrevious: () => void;
+  /** Перейти к вопросу по позиции в текущем порядке показа (с учётом перемешивания) */
+  goTo: (index: number) => void;
   showAnswer: () => void;
   hideAnswer: () => void;
   toggleAnswer: () => void;
@@ -94,6 +96,17 @@ export const useTrainerStore = create<TrainerState>((set, get) => ({
     if (currentIndex > 0) {
       set({ currentIndex: currentIndex - 1, isAnswerVisible: false });
     }
+  },
+
+  goTo: (index) => {
+    const { currentIndex, totalQuestions } = get();
+    if (index < 0 || index >= totalQuestions) return;
+    if (index === currentIndex) {
+      // Уже на этом вопросе — только возвращаемся с экрана завершения, если он открыт
+      set({ isCompleted: false });
+      return;
+    }
+    set({ currentIndex: index, isAnswerVisible: false, isCompleted: false });
   },
 
   showAnswer: () => set({ isAnswerVisible: true }),

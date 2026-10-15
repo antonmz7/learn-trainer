@@ -97,6 +97,10 @@ html {
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --code-block: oklch(0.985 0 0);
+  --code-block-border: oklch(0.88 0 0);
+  --code-block-foreground: oklch(0.2 0 0);
+  --code-block-label: oklch(0.556 0 0);
 }
 
 .dark {
@@ -131,6 +135,10 @@ html {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --code-block: oklch(0.16 0 0);
+  --code-block-border: oklch(1 0 0 / 12%);
+  --code-block-foreground: oklch(0.92 0 0);
+  --code-block-label: oklch(0.65 0 0);
 }
 
 @layer base {
@@ -182,12 +190,71 @@ html {
     display: inline;
   }
 
+  /* Инлайновый код: <code>…</code> внутри текста */
   & code {
     border-radius: 0.25rem;
     background-color: var(--muted);
     padding: 0.125rem 0.375rem;
     font-family: ui-monospace, 'SF Mono', Menlo, monospace;
     font-size: 0.875em;
+  }
+
+  /* Блок кода: <pre data-lang="js"><code>…</code></pre> */
+  & pre {
+    position: relative;
+    margin-top: 0.75rem;
+    overflow-x: auto;
+    border: 1px solid var(--code-block-border);
+    border-radius: 0.5rem;
+    background-color: var(--code-block);
+    color: var(--code-block-foreground);
+    padding: 0.875rem 1rem;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.875em;
+    line-height: 1.6;
+    tab-size: 2;
+    white-space: pre;
+    scrollbar-width: thin;
+  }
+
+  & pre:first-child {
+    margin-top: 0;
+  }
+
+  & pre + p,
+  & pre + ul,
+  & pre + ol {
+    margin-top: 0.75rem;
+  }
+
+  /* Внутри блока инлайновые стили code сбрасываем */
+  & pre > code {
+    display: block;
+    border-radius: 0;
+    background-color: transparent;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  /* Подпись языка в правом верхнем углу: берётся из data-lang */
+  & pre[data-lang] {
+    padding-top: 1.25rem;
+  }
+
+  & pre[data-lang]::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 0.375rem;
+    right: 0.625rem;
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--code-block-label);
+    pointer-events: none;
+    user-select: none;
   }
 
   & strong {

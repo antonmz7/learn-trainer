@@ -74,6 +74,39 @@ describe('useTrainerStore', () => {
       useTrainerStore.getState().goPrevious();
       expect(useTrainerStore.getState().currentIndex).toBe(0);
     });
+
+    it('goTo переходит к вопросу по позиции и скрывает ответ', () => {
+      useTrainerStore.getState().showAnswer();
+      useTrainerStore.getState().goTo(3);
+
+      const state = useTrainerStore.getState();
+      expect(state.currentIndex).toBe(3);
+      expect(state.isAnswerVisible).toBe(false);
+    });
+
+    it('goTo игнорирует индексы вне диапазона', () => {
+      useTrainerStore.getState().goTo(2);
+      useTrainerStore.getState().goTo(-1);
+      expect(useTrainerStore.getState().currentIndex).toBe(2);
+
+      useTrainerStore.getState().goTo(5);
+      expect(useTrainerStore.getState().currentIndex).toBe(2);
+    });
+
+    it('goTo не скрывает ответ, если выбран текущий вопрос', () => {
+      useTrainerStore.getState().goTo(1);
+      useTrainerStore.getState().showAnswer();
+      useTrainerStore.getState().goTo(1);
+      expect(useTrainerStore.getState().isAnswerVisible).toBe(true);
+    });
+
+    it('goTo возвращает с экрана завершения', () => {
+      useTrainerStore.getState().finish();
+      expect(useTrainerStore.getState().isCompleted).toBe(true);
+
+      useTrainerStore.getState().goTo(0);
+      expect(useTrainerStore.getState().isCompleted).toBe(false);
+    });
   });
 
   describe('селекторы', () => {
